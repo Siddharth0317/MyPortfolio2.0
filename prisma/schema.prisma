@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  title        String
+  bio          String
+  avatarUrl    String?
+  resumeUrl    String?
+  githubUrl    String?
+  linkedinUrl  String?
+  twitterUrl   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Project {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  longDescription String?
+  imageUrl        String?
+  category        String   @default("Full Stack")
+  techStack       String[]
+  githubUrl       String?
+  liveUrl         String?
+  featured        Boolean  @default(false)
+  isHidden        Boolean  @default(false)
+  order           Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Skill {
+  id          String   @id @default(cuid())
+  name        String
+  category    String   // e.g., "Frontend", "Backend", "Database", "DevOps"
+  iconName    String?
+  proficiency Int      @default(80)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Achievement {
+  id             String   @id @default(cuid())
+  title          String
+  issuer         String
+  date           String   // e.g., "2024" or "Jan 2024"
+  description    String?
+  certificateUrl String?
+  category       String   @default("Certification") // "Certification", "Award", "Experience"
+  isHidden       Boolean  @default(false)
+  order          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

@@ -402,14 +402,6 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
             >
               <CornerDownLeft className="w-3.5 h-3.5" />
             </button>
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-lg bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 transition-colors flex items-center gap-1 text-xs font-sans px-2"
-              title="Exit Terminal"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Exit</span>
-            </button>
           </div>
         </motion.div>
       </div>

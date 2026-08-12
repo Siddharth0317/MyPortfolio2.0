@@ -83,12 +83,11 @@ export default function PortfolioClientWrapper({
 
         <button
           onClick={() => setIsTerminalOpen(true)}
-          className="flex items-center gap-2 px-4 py-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold shadow-xl shadow-indigo-600/40 hover:scale-105 transition-all duration-200 border border-indigo-400/30 group"
+          className="p-3 rounded-full glass-card hover:bg-white/10 text-indigo-400 hover:text-indigo-300 border border-indigo-500/30 shadow-lg shadow-indigo-950/40 transition-all duration-200 hover:scale-105 flex items-center justify-center group"
           title="Open Interactive CLI Terminal (Ctrl+K)"
+          aria-label="Open CLI Terminal"
         >
-          <Terminal className="w-4 h-4 text-white group-hover:rotate-12 transition-transform" />
-          <span className="hidden sm:inline">CLI Terminal</span>
-          <kbd className="px-1.5 py-0.5 text-[10px] bg-black/40 border border-white/20 rounded font-mono">Ctrl+K</kbd>
+          <Terminal className="w-4 h-4 group-hover:rotate-12 transition-transform" />
         </button>
       </div>
 

@@ -82,7 +82,7 @@ export default function AdminMessagesPage() {
   const handleOpenReplyDrawer = () => {
     if (!selectedMessage) return;
     setReplySubject(`Re: ${selectedMessage.subject || "Portfolio Inquiry"}`);
-    setReplyText(`Hi ${selectedMessage.name},\n\nThank you for reaching out regarding "${selectedMessage.subject || 'your inquiry'}". I would love to connect!\n\nBest regards,\nAlex`);
+    setReplyText(`Hi ${selectedMessage.name},\n\nThank you for reaching out regarding "${selectedMessage.subject || 'your inquiry'}". I would love to connect!\n\nBest regards,\nSid`);
     setIsReplyOpen(true);
     setReplyStatus(null);
   };
@@ -90,11 +90,11 @@ export default function AdminMessagesPage() {
   const applyTemplate = (templateType: "interview" | "resume" | "quote") => {
     if (!selectedMessage) return;
     if (templateType === "interview") {
-      setReplyText(`Hi ${selectedMessage.name},\n\nThank you for reaching out! I reviewed your message regarding the engineering role. I am very interested in learning more and would love to schedule a brief introductory call this week.\n\nPlease let me know a few dates and times that work best for your team!\n\nBest regards,\nAlex Dev`);
+      setReplyText(`Hi ${selectedMessage.name},\n\nThank you for reaching out! I reviewed your message regarding the engineering role. I am very interested in learning more and would love to schedule a brief introductory call this week.\n\nPlease let me know a few dates and times that work best for your team!\n\nBest regards,\nSid`);
     } else if (templateType === "resume") {
-      setReplyText(`Hi ${selectedMessage.name},\n\nThank you for your interest in my background! You can view and download my full, updated technical resume here: https://alexdev.com/resume.pdf\n\nFeel free to ask if you have any questions about my past experience at TechCorp or AI project architecture.\n\nBest regards,\nAlex Dev`);
+      setReplyText(`Hi ${selectedMessage.name},\n\nThank you for your interest in my background! You can view and download my full, updated technical resume here: https://sid.dev/resume.pdf\n\nFeel free to ask if you have any questions about my past experience or AI project architecture.\n\nBest regards,\nSid`);
     } else if (templateType === "quote") {
-      setReplyText(`Hi ${selectedMessage.name},\n\nThank you for sharing the details of your project! I specialize in full-stack Next.js, Supabase, and cloud architecture solutions. I have reviewed your requirements and would love to discuss scope, deliverables, and timelines.\n\nLet me know when you are free for a short discovery call!\n\nBest regards,\nAlex Dev`);
+      setReplyText(`Hi ${selectedMessage.name},\n\nThank you for sharing the details of your project! I specialize in full-stack Next.js, Supabase, and cloud architecture solutions. I have reviewed your requirements and would love to discuss scope, deliverables, and timelines.\n\nLet me know when you are free for a short discovery call!\n\nBest regards,\nSid`);
     }
   };
 

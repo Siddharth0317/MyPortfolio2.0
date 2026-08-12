@@ -30,7 +30,7 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
       command: "welcome",
       output: (
         <div className="space-y-1 text-xs text-slate-300">
-          <p className="text-indigo-400 font-bold">Welcome to Alex.dev Interactive Terminal v1.0.4</p>
+          <p className="text-indigo-400 font-bold">Welcome to Sid.dev Interactive Terminal v1.0.4</p>
           <p className="text-slate-400">Type <span className="text-emerald-400 font-semibold">&apos;help&apos;</span> to see all available commands, or <span className="text-emerald-400 font-semibold">&apos;theme [name]&apos;</span> to switch glow presets.</p>
         </div>
       ),
@@ -317,7 +317,7 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
 
             <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
               <Terminal className="w-3.5 h-3.5 text-indigo-400" />
-              alex@dev-machine:~ (zsh)
+              sid@dev-machine:~ (zsh)
             </div>
 
             <div className="flex items-center gap-1">
@@ -337,7 +337,7 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
             {history.map((log) => (
               <div key={log.id} className="space-y-1">
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="text-emerald-400 font-bold">alex.dev@portfolio:~$</span>
+                  <span className="text-emerald-400 font-bold">sid.dev@portfolio:~$</span>
                   <span className="text-white font-medium">{log.command}</span>
                 </div>
                 <div className="pl-4 border-l-2 border-slate-800 py-1">{log.output}</div>
@@ -347,7 +347,7 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
           </div>
 
           <div className="p-4 bg-slate-900/90 border-t border-white/10 flex items-center gap-3">
-            <span className="text-xs text-emerald-400 font-bold shrink-0">alex.dev@portfolio:~$</span>
+            <span className="text-xs text-emerald-400 font-bold shrink-0">sid.dev@portfolio:~$</span>
             <input
               ref={inputRef}
               type="text"

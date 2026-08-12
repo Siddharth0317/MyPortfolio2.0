@@ -37,7 +37,7 @@ export const INITIAL_BADGES: VisitorBadge[] = [
   {
     id: "ai_collaborator",
     name: "AI Collaborator",
-    description: "Asked a question to Alex's AI Twin.",
+    description: "Asked a question to Sid's AI Twin.",
     icon: "🤖",
     unlocked: false,
   },

@@ -5,7 +5,7 @@ export const runtime = "nodejs";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const title = searchParams.get("title") || "Alex Dev | Senior Full-Stack Engineer";
+    const title = searchParams.get("title") || "Sid.dev | Senior Full-Stack Engineer";
     const bio = searchParams.get("bio") || "Full-Stack Engineer & System Architect. Building high-performance Next.js apps, distributed microservices, and modern web tooling.";
 
     return new ImageResponse(
@@ -59,7 +59,7 @@ export async function GET(request: Request) {
               &lt;/&gt;
             </div>
             <span style={{ fontSize: "24px", fontWeight: 800, letterSpacing: "-0.5px" }}>
-              Alex<span style={{ color: "#6366f1" }}>.dev</span>
+              Sid<span style={{ color: "#6366f1" }}>.dev</span>
             </span>
           </div>
 

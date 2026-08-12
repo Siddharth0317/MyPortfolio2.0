@@ -18,7 +18,7 @@ export default function AiAssistantWidget() {
     {
       id: "welcome",
       sender: "ai",
-      text: "Hi! 👋 I'm Alex's AI Twin. I have real-time access to Alex's current projects, technical skills, and career background. Ask me anything!",
+      text: "Hi! 👋 I'm Sid's AI Twin. I have real-time access to Sid's current projects, technical skills, and career background. Ask me anything!",
     },
   ]);
 
@@ -82,9 +82,9 @@ export default function AiAssistantWidget() {
   };
 
   const quickPrompts = [
-    "What are Alex's top Next.js projects?",
-    "Summarize Alex's tech stack",
-    "Is Alex available for hire?",
+    "What are Sid's top Next.js projects?",
+    "Summarize Sid's tech stack",
+    "Is Sid available for hire?",
   ];
 
   return (
@@ -96,7 +96,7 @@ export default function AiAssistantWidget() {
           triggerBadgeUnlock();
         }}
         className="p-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white shadow-xl shadow-purple-600/40 hover:scale-105 transition-all duration-200 border border-purple-400/30 flex items-center justify-center relative group"
-        title="Ask Alex's AI Twin"
+        title="Ask Sid's AI Twin"
         aria-label="AI Assistant"
       >
         <Bot className="w-5 h-5 group-hover:rotate-12 transition-transform" />
@@ -125,7 +125,7 @@ export default function AiAssistantWidget() {
                   </div>
                   <div>
                     <h3 className="font-bold text-white text-sm flex items-center gap-1.5 leading-tight">
-                      Alex&apos;s AI Twin <Sparkles className="w-3.5 h-3.5 text-pink-400" />
+                      Sid&apos;s AI Twin <Sparkles className="w-3.5 h-3.5 text-pink-400" />
                     </h3>
                     <p className="text-[11px] text-slate-400">Powered by Live Database Knowledge</p>
                   </div>
@@ -196,7 +196,7 @@ export default function AiAssistantWidget() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-                  placeholder="Ask me anything about Alex..."
+                  placeholder="Ask me anything about Sid..."
                   className="flex-1 bg-transparent border-none text-white text-xs focus:outline-none placeholder:text-slate-500 px-2"
                 />
                 <button

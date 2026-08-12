@@ -18,7 +18,7 @@ interface HeroProps {
 }
 
 export default function Hero({ profile, onResumeClick }: HeroProps) {
-  const name = profile?.name || "Alex Dev";
+  const name = profile?.name || "Siddharth";
   const title = profile?.title || "Senior Full-Stack Engineer & System Architect";
   const bio = profile?.bio || "Building high-performance web applications, distributed microservices, and modern digital experiences with Next.js, React, Node.js, and Cloud technologies.";
   const resumeUrl = profile?.resumeUrl || "#";

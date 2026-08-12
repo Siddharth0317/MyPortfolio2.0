@@ -26,7 +26,7 @@ export async function GET() {
 
     if (!user) {
       return NextResponse.json({
-        name: "Alex Dev",
+        name: "Siddharth",
         title: "Senior Full-Stack Engineer & System Architect",
         bio: "Passionate Senior Full-Stack Engineer building high-scale web applications and interactive developer tooling.",
         avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",

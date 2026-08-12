@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     if (apiKey) {
       const resend = new Resend(apiKey);
       const profile = await prisma.user.findFirst();
-      const senderName = profile?.name || "Alex Dev";
+      const senderName = profile?.name || "Siddharth";
 
       await resend.emails.send({
         from: `${senderName} <onboarding@resend.dev>`,

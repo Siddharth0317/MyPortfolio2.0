@@ -40,7 +40,7 @@ export default function Navbar({ onOpenTerminal, onOpenResume }: NavbarProps) {
             <Terminal className="w-5 h-5" />
           </div>
           <span className="font-bold text-xl tracking-tight text-white group-hover:text-indigo-400 transition-colors">
-            Alex<span className="text-indigo-500">.dev</span>
+            Sid<span className="text-indigo-500">.dev</span>
           </span>
         </Link>
 

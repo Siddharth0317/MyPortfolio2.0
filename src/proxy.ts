@@ -1,8 +1,8 @@
 import { withAuth } from "next-auth/middleware";
 
 export default withAuth(
-  function middleware() {
-    // Session verified by NextAuth middleware
+  function proxy() {
+    // Session verified by NextAuth proxy
   },
   {
     callbacks: {
@@ -22,5 +22,6 @@ export const config = {
     "/admin/timeline/:path*",
     "/admin/messages/:path*",
     "/admin/profile/:path*",
+    "/admin/security/:path*",
   ],
 };

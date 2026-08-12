@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// GET /api/projects - Public route to fetch all projects
+// GET /api/projects - Public route to fetch all projects with Cache-Control optimization
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -26,7 +26,11 @@ export async function GET(req: Request) {
       orderBy: { order: "asc" },
     });
 
-    return NextResponse.json(projects);
+    const response = NextResponse.json(projects);
+    if (!isAuthorized) {
+      response.headers.set("Cache-Control", "public, max-age=60, s-maxage=3600, stale-while-revalidate=86400");
+    }
+    return response;
   } catch (error: any) {
     console.error("Error fetching projects:", error);
     return NextResponse.json({ error: "Failed to fetch projects" }, { status: 500 });

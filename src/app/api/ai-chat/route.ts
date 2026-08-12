@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 export async function POST(req: Request) {
   try {
+    const ip = req.headers.get("x-forwarded-for") || "127.0.0.1";
+    const { allowed } = checkRateLimit(ip, 12, 60000); // 12 AI queries per min max
+
+    if (!allowed) {
+      return NextResponse.json({ error: "Too many AI chat queries. Please wait a minute before asking more questions." }, { status: 429 });
+    }
+
     const { messages } = await req.json();
     if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json({ error: "Messages array required" }, { status: 400 });
@@ -10,12 +18,25 @@ export async function POST(req: Request) {
 
     const userMessage = messages[messages.length - 1]?.content || "";
 
-    // 1. Fetch Real-time Live Knowledge from Supabase Database
+    // 1. Fetch Real-time Live Knowledge from Supabase Database with Select Optimization
     const [rawProfile, rawProjects, rawSkills, rawAchievements] = await Promise.all([
-      prisma.user.findFirst(),
-      prisma.project.findMany({ where: { isHidden: false }, orderBy: { order: "asc" } }),
-      prisma.skill.findMany({ orderBy: { order: "asc" } }),
-      prisma.achievement.findMany({ where: { isHidden: false }, orderBy: { order: "asc" } }),
+      prisma.user.findFirst({
+        select: { name: true, title: true, bio: true, githubUrl: true, linkedinUrl: true },
+      }),
+      prisma.project.findMany({
+        where: { isHidden: false },
+        select: { title: true, category: true, description: true, techStack: true, liveUrl: true, githubUrl: true },
+        orderBy: { order: "asc" },
+      }),
+      prisma.skill.findMany({
+        select: { name: true, category: true, proficiency: true },
+        orderBy: { order: "asc" },
+      }),
+      prisma.achievement.findMany({
+        where: { isHidden: false },
+        select: { title: true, issuer: true, date: true, description: true },
+        orderBy: { order: "asc" },
+      }),
     ]);
 
     const name = rawProfile?.name || "Alex Dev";
@@ -63,7 +84,6 @@ INSTRUCTIONS:
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (apiKey) {
-      // Model versions list (tries primary model specified in env or latest Flash models)
       const modelsToTry = [
         process.env.GEMINI_MODEL || "gemini-2.0-flash",
         "gemini-1.5-flash",

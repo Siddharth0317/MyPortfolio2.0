@@ -8,7 +8,9 @@ export async function GET() {
     const skills = await prisma.skill.findMany({
       orderBy: { order: "asc" },
     });
-    return NextResponse.json(skills);
+    const response = NextResponse.json(skills);
+    response.headers.set("Cache-Control", "public, max-age=60, s-maxage=3600, stale-while-revalidate=86400");
+    return response;
   } catch (error: any) {
     console.error("Error fetching skills:", error);
     return NextResponse.json({ error: "Failed to fetch skills" }, { status: 500 });

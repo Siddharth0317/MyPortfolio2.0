@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import Navbar from "@/components/public/Navbar";
 import Hero from "@/components/public/Hero";
 import About from "@/components/public/About";
@@ -8,12 +9,14 @@ import ProjectsShowcase, { Project } from "@/components/public/ProjectsShowcase"
 import Timeline, { Achievement } from "@/components/public/Timeline";
 import ContactForm from "@/components/public/ContactForm";
 import Footer from "@/components/public/Footer";
-import ResumeModal from "@/components/public/ResumeModal";
-import TerminalModal from "@/components/public/TerminalModal";
 import ThemePicker from "@/components/public/ThemePicker";
-import AiAssistantWidget from "@/components/public/AiAssistantWidget";
-import AchievementBadgesWidget from "@/components/public/AchievementBadgesWidget";
 import { Terminal } from "lucide-react";
+
+// Dynamic imports with ssr: false for heavy floating widgets & modals to optimize initial JS bundle size & Core Web Vitals
+const ResumeModal = dynamic(() => import("@/components/public/ResumeModal"), { ssr: false });
+const TerminalModal = dynamic(() => import("@/components/public/TerminalModal"), { ssr: false });
+const AiAssistantWidget = dynamic(() => import("@/components/public/AiAssistantWidget"), { ssr: false });
+const AchievementBadgesWidget = dynamic(() => import("@/components/public/AchievementBadgesWidget"), { ssr: false });
 
 interface PortfolioClientWrapperProps {
   profile?: {
@@ -90,21 +93,25 @@ export default function PortfolioClientWrapper({
       </div>
 
       {/* Modals */}
-      <ResumeModal
-        isOpen={isResumeModalOpen}
-        onClose={() => setIsResumeModalOpen(false)}
-        profile={profile}
-      />
+      {isResumeModalOpen && (
+        <ResumeModal
+          isOpen={isResumeModalOpen}
+          onClose={() => setIsResumeModalOpen(false)}
+          profile={profile}
+        />
+      )}
 
-      <TerminalModal
-        isOpen={isTerminalOpen}
-        onClose={() => setIsTerminalOpen(false)}
-        onOpenResume={() => {
-          setIsTerminalOpen(false);
-          setIsResumeModalOpen(true);
-        }}
-        profile={profile}
-      />
+      {isTerminalOpen && (
+        <TerminalModal
+          isOpen={isTerminalOpen}
+          onClose={() => setIsTerminalOpen(false)}
+          onOpenResume={() => {
+            setIsTerminalOpen(false);
+            setIsResumeModalOpen(true);
+          }}
+          profile={profile}
+        />
+      )}
     </>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Terminal, X, Minimize2, Maximize2, Sparkles, CornerDownLeft } from "lucide-react";
+import { Terminal, X, Minimize2, Maximize2, CornerDownLeft, LogOut } from "lucide-react";
 import { ThemePreset, THEME_PRESETS } from "@/components/public/ThemePicker";
 
 interface TerminalModalProps {
@@ -31,7 +31,9 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
       output: (
         <div className="space-y-1 text-xs text-slate-300">
           <p className="text-indigo-400 font-bold">Welcome to Sid.dev Interactive Terminal v1.0.4</p>
-          <p className="text-slate-400">Type <span className="text-emerald-400 font-semibold">&apos;help&apos;</span> to see all available commands, or <span className="text-emerald-400 font-semibold">&apos;theme [name]&apos;</span> to switch glow presets.</p>
+          <p className="text-slate-400">
+            Type <span className="text-emerald-400 font-semibold">&apos;help&apos;</span> to see all commands, or <span className="text-rose-400 font-semibold">&apos;exit&apos;</span> / press <kbd className="px-1 py-0.5 text-[10px] bg-slate-900 border border-slate-700 rounded text-slate-300">Esc</kbd> to close.
+          </p>
         </div>
       ),
     },
@@ -56,9 +58,12 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+      if (e.key === "Escape") {
         e.preventDefault();
-        if (isOpen) onClose();
+        onClose();
+      } else if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        onClose();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -88,6 +93,19 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
     let output: React.ReactNode = null;
 
     switch (mainCmd) {
+      case "exit":
+      case "quit":
+      case "q":
+      case "logout":
+      case "close":
+        output = (
+          <div className="text-xs text-rose-400 font-semibold">
+            Closing terminal session...
+          </div>
+        );
+        setTimeout(() => onClose(), 200);
+        break;
+
       case "help":
       case "commands":
         output = (
@@ -105,6 +123,7 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
               <div><span className="text-emerald-400 font-bold">whoami</span> : Print visitor session data</div>
               <div><span className="text-emerald-400 font-bold">sudo</span> : Administrative privileges test</div>
               <div><span className="text-emerald-400 font-bold">clear</span> / <span className="text-emerald-400 font-bold">cls</span> : Clear terminal history</div>
+              <div><span className="text-rose-400 font-bold">exit</span> / <span className="text-rose-400 font-bold">quit</span> : Close terminal modal</div>
             </div>
           </div>
         );
@@ -138,7 +157,7 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
       case "bio":
         output = (
           <div className="text-xs text-slate-300 space-y-1">
-            <p className="text-white font-bold">{profile?.name || "Alex Dev"} — {profile?.title || "Senior Full-Stack Engineer"}</p>
+            <p className="text-white font-bold">{profile?.name || "Siddharth"} — {profile?.title || "Senior Full-Stack Engineer"}</p>
             <p className="text-slate-400">{profile?.bio || "Passionate engineer with 6+ years of experience building high-scale web apps, Next.js microservices, and interactive web tooling."}</p>
           </div>
         );
@@ -240,7 +259,7 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
       default:
         output = (
           <div className="text-xs text-rose-400">
-            Command not recognized: <span className="font-bold">{trimmed}</span>. Type <span className="text-emerald-400 underline cursor-pointer" onClick={() => executeCommand("help")}>&apos;help&apos;</span> for supported commands.
+            Command not recognized: <span className="font-bold">{trimmed}</span>. Type <span className="text-emerald-400 underline cursor-pointer" onClick={() => executeCommand("help")}>&apos;help&apos;</span> or <span className="text-rose-400 font-bold" onClick={onClose}>&apos;exit&apos;</span>.
           </div>
         );
         break;
@@ -284,7 +303,13 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      {/* Backdrop overlay - clicking outside window closes modal */}
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
+      >
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -294,24 +319,25 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
             isExpanded ? "max-w-6xl h-[90vh]" : "max-w-3xl h-[600px]"
           }`}
         >
+          {/* Header Title Bar */}
           <div className="px-4 py-3 bg-slate-950 border-b border-white/10 flex items-center justify-between select-none">
             <div className="flex items-center gap-2">
               <button
                 onClick={onClose}
-                className="w-3 h-3 rounded-full bg-rose-500 hover:bg-rose-600 transition-colors flex items-center justify-center group"
-                title="Close"
+                className="w-3.5 h-3.5 rounded-full bg-rose-500 hover:bg-rose-600 transition-all flex items-center justify-center group"
+                title="Close Terminal (Esc)"
               >
-                <X className="w-2 h-2 text-rose-950 opacity-0 group-hover:opacity-100" />
+                <X className="w-2.5 h-2.5 text-rose-950 opacity-0 group-hover:opacity-100" />
               </button>
               <button
                 onClick={onClose}
-                className="w-3 h-3 rounded-full bg-amber-500 hover:bg-amber-600 transition-colors"
-                title="Minimize"
+                className="w-3.5 h-3.5 rounded-full bg-amber-500 hover:bg-amber-600 transition-colors"
+                title="Minimize Terminal"
               />
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="w-3 h-3 rounded-full bg-emerald-500 hover:bg-emerald-600 transition-colors"
-                title="Toggle expand"
+                className="w-3.5 h-3.5 rounded-full bg-emerald-500 hover:bg-emerald-600 transition-colors"
+                title="Toggle Maximize"
               />
             </div>
 
@@ -320,16 +346,27 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
               sid@dev-machine:~ (zsh)
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="p-1 rounded text-slate-400 hover:text-white transition-colors"
+                title="Resize"
               >
                 {isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+              </button>
+
+              <button
+                onClick={onClose}
+                className="p-1 rounded text-rose-400 hover:text-white hover:bg-rose-500/20 transition-colors flex items-center gap-1 text-xs px-2 border border-rose-500/30"
+                title="Close (Esc)"
+              >
+                <X className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline font-sans text-[11px] font-bold">Exit</span>
               </button>
             </div>
           </div>
 
+          {/* Terminal Console Buffer */}
           <div
             className="flex-1 p-5 overflow-y-auto space-y-4 bg-slate-950/90 text-sm leading-relaxed"
             onClick={() => inputRef.current?.focus()}
@@ -346,6 +383,7 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
             <div ref={bottomRef} />
           </div>
 
+          {/* Terminal Input Bar */}
           <div className="p-4 bg-slate-900/90 border-t border-white/10 flex items-center gap-3">
             <span className="text-xs text-emerald-400 font-bold shrink-0">sid.dev@portfolio:~$</span>
             <input
@@ -354,14 +392,23 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Type command ('help', 'theme emerald', 'resume')..."
+              placeholder="Type command ('help', 'exit', 'theme emerald', 'resume')..."
               className="flex-1 bg-transparent border-none text-white text-xs font-mono focus:outline-none focus:ring-0 placeholder:text-slate-600"
             />
             <button
               onClick={() => executeCommand(input)}
               className="p-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
+              title="Run Command"
             >
               <CornerDownLeft className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-lg bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 transition-colors flex items-center gap-1 text-xs font-sans px-2"
+              title="Exit Terminal"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Exit</span>
             </button>
           </div>
         </motion.div>

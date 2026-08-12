@@ -10,6 +10,7 @@ import {
   Award,
   Inbox,
   User,
+  Key,
   ExternalLink,
   LogOut,
   Shield,
@@ -26,6 +27,7 @@ export default function AdminSidebar() {
     { label: "Timeline & Certs", href: "/admin/timeline", icon: Award },
     { label: "Message Inbox", href: "/admin/messages", icon: Inbox },
     { label: "Profile & Bio", href: "/admin/profile", icon: User },
+    { label: "Security & Credentials", href: "/admin/security", icon: Key },
   ];
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Eye, EyeOff, Search, ExternalLink, Loader2, Sparkles, X, Check } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, EyeOff, Search, ExternalLink, Loader2, Sparkles, X, Check, ArrowUp, ArrowDown } from "lucide-react";
 import { GithubIcon } from "@/components/common/SocialIcons";
 import ImageUploader from "@/components/admin/ImageUploader";
 
@@ -59,6 +59,32 @@ export default function AdminProjectsPage() {
   useEffect(() => {
     fetchProjects();
   }, []);
+
+  const handleReorder = async (index: number, direction: "up" | "down") => {
+    const newProjects = [...projects];
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= newProjects.length) return;
+
+    // Swap positions
+    const temp = newProjects[index];
+    newProjects[index] = newProjects[targetIndex];
+    newProjects[targetIndex] = temp;
+
+    // Recalculate order values
+    const updatedItems = newProjects.map((p, idx) => ({ id: p.id, order: idx + 1 }));
+    setProjects(newProjects.map((p, idx) => ({ ...p, order: idx + 1 })));
+
+    try {
+      await fetch("/api/projects/reorder", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: updatedItems }),
+      });
+    } catch (err) {
+      console.error("Failed to reorder projects:", err);
+      fetchProjects();
+    }
+  };
 
   const handleOpenAddModal = () => {
     setEditingProject(null);
@@ -160,7 +186,7 @@ export default function AdminProjectsPage() {
       <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div>
           <h1 className="text-3xl font-extrabold text-white">Project Manager</h1>
-          <p className="text-sm text-slate-400">Add, edit, reorder, or hide portfolio projects dynamically.</p>
+          <p className="text-sm text-slate-400">Add, edit, reorder positions, or hide portfolio projects dynamically.</p>
         </div>
 
         <button
@@ -192,7 +218,7 @@ export default function AdminProjectsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4">
-          {filteredProjects.map((p) => (
+          {filteredProjects.map((p, index) => (
             <div
               key={p.id}
               className={`glass-card p-5 rounded-2xl border border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-200 ${
@@ -200,6 +226,26 @@ export default function AdminProjectsPage() {
               }`}
             >
               <div className="flex items-center gap-4">
+                {/* Reorder Arrows */}
+                <div className="flex flex-col gap-1 shrink-0">
+                  <button
+                    disabled={index === 0}
+                    onClick={() => handleReorder(index, "up")}
+                    className="p-1 rounded bg-slate-900 text-slate-400 hover:text-white disabled:opacity-30 transition-colors"
+                    title="Move Position Up"
+                  >
+                    <ArrowUp className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    disabled={index === filteredProjects.length - 1}
+                    onClick={() => handleReorder(index, "down")}
+                    className="p-1 rounded bg-slate-900 text-slate-400 hover:text-white disabled:opacity-30 transition-colors"
+                    title="Move Position Down"
+                  >
+                    <ArrowDown className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
                 <img
                   src={p.imageUrl || "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80"}
                   alt={p.title}
@@ -207,6 +253,9 @@ export default function AdminProjectsPage() {
                 />
                 <div>
                   <div className="flex items-center gap-2 mb-1">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-900 text-slate-400 font-mono">
+                      #{index + 1}
+                    </span>
                     <h3 className="text-base font-bold text-white">{p.title}</h3>
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
                       {p.category}

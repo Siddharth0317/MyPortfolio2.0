@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Inbox, Mail, MailOpen, Trash2, Loader2, CheckCircle2, Clock, X } from "lucide-react";
+import { Inbox, Mail, MailOpen, Trash2, Loader2, CheckCircle2, Clock, X, Send, Sparkles, FileText } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 interface Message {
@@ -18,6 +18,13 @@ export default function AdminMessagesPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+
+  // Direct Reply Drawer State
+  const [isReplyOpen, setIsReplyOpen] = useState(false);
+  const [replyText, setReplyText] = useState("");
+  const [replySubject, setReplySubject] = useState("");
+  const [sendingReply, setSendingReply] = useState(false);
+  const [replyStatus, setReplyStatus] = useState<string | null>(null);
 
   const fetchMessages = async () => {
     try {
@@ -55,6 +62,7 @@ export default function AdminMessagesPage() {
       const res = await fetch(`/api/messages/${id}`, { method: "DELETE" });
       if (res.ok) {
         setSelectedMessage(null);
+        setIsReplyOpen(false);
         fetchMessages();
       }
     } catch (err) {
@@ -64,8 +72,66 @@ export default function AdminMessagesPage() {
 
   const openMessageDetail = (msg: Message) => {
     setSelectedMessage(msg);
+    setIsReplyOpen(false);
+    setReplyStatus(null);
     if (!msg.isRead) {
       handleToggleRead(msg);
+    }
+  };
+
+  const handleOpenReplyDrawer = () => {
+    if (!selectedMessage) return;
+    setReplySubject(`Re: ${selectedMessage.subject || "Portfolio Inquiry"}`);
+    setReplyText(`Hi ${selectedMessage.name},\n\nThank you for reaching out regarding "${selectedMessage.subject || 'your inquiry'}". I would love to connect!\n\nBest regards,\nAlex`);
+    setIsReplyOpen(true);
+    setReplyStatus(null);
+  };
+
+  const applyTemplate = (templateType: "interview" | "resume" | "quote") => {
+    if (!selectedMessage) return;
+    if (templateType === "interview") {
+      setReplyText(`Hi ${selectedMessage.name},\n\nThank you for reaching out! I reviewed your message regarding the engineering role. I am very interested in learning more and would love to schedule a brief introductory call this week.\n\nPlease let me know a few dates and times that work best for your team!\n\nBest regards,\nAlex Dev`);
+    } else if (templateType === "resume") {
+      setReplyText(`Hi ${selectedMessage.name},\n\nThank you for your interest in my background! You can view and download my full, updated technical resume here: https://alexdev.com/resume.pdf\n\nFeel free to ask if you have any questions about my past experience at TechCorp or AI project architecture.\n\nBest regards,\nAlex Dev`);
+    } else if (templateType === "quote") {
+      setReplyText(`Hi ${selectedMessage.name},\n\nThank you for sharing the details of your project! I specialize in full-stack Next.js, Supabase, and cloud architecture solutions. I have reviewed your requirements and would love to discuss scope, deliverables, and timelines.\n\nLet me know when you are free for a short discovery call!\n\nBest regards,\nAlex Dev`);
+    }
+  };
+
+  const handleSendReply = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedMessage) return;
+    setSendingReply(true);
+    setReplyStatus(null);
+
+    try {
+      const res = await fetch("/api/messages/reply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messageId: selectedMessage.id,
+          recipientEmail: selectedMessage.email,
+          recipientName: selectedMessage.name,
+          subject: replySubject,
+          replyText,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setReplyStatus(data.message || "Reply email dispatched successfully!");
+        setTimeout(() => {
+          setIsReplyOpen(false);
+          setSelectedMessage(null);
+          fetchMessages();
+        }, 1500);
+      } else {
+        setReplyStatus("Error: " + (data.error || "Failed to send email"));
+      }
+    } catch (err: any) {
+      setReplyStatus("Error sending email.");
+    } finally {
+      setSendingReply(false);
     }
   };
 
@@ -84,7 +150,7 @@ export default function AdminMessagesPage() {
               </span>
             )}
           </div>
-          <p className="text-sm text-slate-400">View and respond to inquiries submitted through your public portfolio contact form.</p>
+          <p className="text-sm text-slate-400">View and respond directly to inquiries submitted through your public portfolio contact form.</p>
         </div>
       </div>
 
@@ -147,10 +213,10 @@ export default function AdminMessagesPage() {
         </div>
       )}
 
-      {/* Message Detail Modal */}
+      {/* Message Detail & Direct Reply Modal */}
       {selectedMessage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="glass-card max-w-lg w-full rounded-3xl border border-white/10 p-6 sm:p-8 relative">
+          <div className="glass-card max-w-xl w-full rounded-3xl border border-white/10 p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setSelectedMessage(null)}
               className="absolute top-4 right-4 p-2 rounded-full bg-slate-900 text-slate-400 hover:text-white border border-slate-800"
@@ -170,25 +236,106 @@ export default function AdminMessagesPage() {
               </div>
             </div>
 
-            <div className="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 text-slate-200 text-sm leading-relaxed whitespace-pre-wrap mb-6 max-h-60 overflow-y-auto">
+            <div className="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 text-slate-200 text-sm leading-relaxed whitespace-pre-wrap mb-6 max-h-48 overflow-y-auto">
               {selectedMessage.message}
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-white/10">
-              <a
-                href={`mailto:${selectedMessage.email}?subject=Re: ${encodeURIComponent(selectedMessage.subject || 'Portfolio Inquiry')}`}
-                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg shadow-indigo-600/30 flex items-center gap-2"
-              >
-                <Mail className="w-3.5 h-3.5" /> Reply via Email
-              </a>
+            {!isReplyOpen ? (
+              <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                <button
+                  onClick={handleOpenReplyDrawer}
+                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg shadow-indigo-600/30 flex items-center gap-2"
+                >
+                  <Send className="w-3.5 h-3.5" /> Direct Email Reply
+                </button>
 
-              <button
-                onClick={() => handleDeleteMessage(selectedMessage.id)}
-                className="px-4 py-2.5 rounded-xl text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 text-xs font-semibold transition-colors"
-              >
-                Delete Message
-              </button>
-            </div>
+                <button
+                  onClick={() => handleDeleteMessage(selectedMessage.id)}
+                  className="px-4 py-2.5 rounded-xl text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 text-xs font-semibold transition-colors"
+                >
+                  Delete Message
+                </button>
+              </div>
+            ) : (
+              /* Inline Reply & Template Builder Drawer */
+              <form onSubmit={handleSendReply} className="pt-4 border-t border-white/10 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase text-indigo-400 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-pink-400" /> Pre-Saved Response Templates:
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => applyTemplate("interview")}
+                    className="px-3 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 text-xs font-semibold border border-indigo-500/20"
+                  >
+                    📅 Schedule Interview
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyTemplate("resume")}
+                    className="px-3 py-1 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 text-xs font-semibold border border-purple-500/20"
+                  >
+                    📄 Send Resume Link
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyTemplate("quote")}
+                    className="px-3 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold border border-amber-500/20"
+                  >
+                    💼 Consulting Quote
+                  </button>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1">Subject</label>
+                  <input
+                    type="text"
+                    required
+                    value={replySubject}
+                    onChange={(e) => setReplySubject(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl glass-input text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1">Email Body Response</label>
+                  <textarea
+                    required
+                    rows={5}
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl glass-input text-xs resize-none"
+                  />
+                </div>
+
+                {replyStatus && (
+                  <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold">
+                    {replyStatus}
+                  </div>
+                )}
+
+                <div className="flex items-center justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsReplyOpen(false)}
+                    className="px-4 py-2 rounded-xl glass-card hover:bg-white/10 text-slate-300 text-xs font-semibold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={sendingReply}
+                    className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg shadow-indigo-600/30 flex items-center gap-2 disabled:opacity-50"
+                  >
+                    {sendingReply ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                    Send Email Response
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}

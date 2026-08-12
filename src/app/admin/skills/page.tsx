@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Loader2, Wrench, X, Check } from "lucide-react";
+import { Plus, Edit, Trash2, Loader2, Wrench, X, Check, ArrowUp, ArrowDown } from "lucide-react";
 
 interface Skill {
   id: string;
@@ -45,6 +45,38 @@ export default function AdminSkillsPage() {
   useEffect(() => {
     fetchSkills();
   }, []);
+
+  const handleReorder = async (category: string, index: number, direction: "up" | "down") => {
+    const categorySkills = skills.filter((s) => s.category === category);
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= categorySkills.length) return;
+
+    // Swap positions
+    const temp = categorySkills[index];
+    categorySkills[index] = categorySkills[targetIndex];
+    categorySkills[targetIndex] = temp;
+
+    // Reassign order
+    const updatedItems = categorySkills.map((s, idx) => ({ id: s.id, order: idx + 1 }));
+
+    // Optimistic state update
+    const updatedSkills = skills.map((s) => {
+      const match = updatedItems.find((u) => u.id === s.id);
+      return match ? { ...s, order: match.order } : s;
+    });
+    setSkills(updatedSkills);
+
+    try {
+      await fetch("/api/skills/reorder", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: updatedItems }),
+      });
+    } catch (err) {
+      console.error("Failed to reorder skills:", err);
+      fetchSkills();
+    }
+  };
 
   const handleOpenAddModal = () => {
     setEditingSkill(null);
@@ -112,7 +144,7 @@ export default function AdminSkillsPage() {
       <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div>
           <h1 className="text-3xl font-extrabold text-white">Skills Matrix Manager</h1>
-          <p className="text-sm text-slate-400">Configure tech stack badges, categories, and proficiency percentages.</p>
+          <p className="text-sm text-slate-400">Configure tech stack badges, reorder positions, categories, and proficiency percentages.</p>
         </div>
 
         <button
@@ -142,11 +174,31 @@ export default function AdminSkillsPage() {
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {categorySkills.map((s) => (
+                  {categorySkills.map((s, index) => (
                     <div
                       key={s.id}
                       className="glass-card p-4 rounded-2xl border border-white/5 flex items-center justify-between gap-3 hover:border-indigo-500/30 transition-colors"
                     >
+                      {/* Reorder Arrows */}
+                      <div className="flex flex-col gap-0.5 shrink-0">
+                        <button
+                          disabled={index === 0}
+                          onClick={() => handleReorder(cat, index, "up")}
+                          className="p-0.5 rounded bg-slate-900 text-slate-400 hover:text-white disabled:opacity-30 transition-colors"
+                          title="Move Up"
+                        >
+                          <ArrowUp className="w-3 h-3" />
+                        </button>
+                        <button
+                          disabled={index === categorySkills.length - 1}
+                          onClick={() => handleReorder(cat, index, "down")}
+                          className="p-0.5 rounded bg-slate-900 text-slate-400 hover:text-white disabled:opacity-30 transition-colors"
+                          title="Move Down"
+                        >
+                          <ArrowDown className="w-3 h-3" />
+                        </button>
+                      </div>
+
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
                           <span className="font-semibold text-white text-sm truncate">{s.name}</span>

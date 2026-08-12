@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import AnalyticsCharts from "@/components/admin/AnalyticsCharts";
 import DataBackupManager from "@/components/admin/DataBackupManager";
+import AdminNotesWidget from "@/components/admin/AdminNotesWidget";
 import Link from "next/link";
 import { FolderGit2, Cpu, Award, Mail, ArrowUpRight, Plus, Shield } from "lucide-react";
 
@@ -122,6 +123,9 @@ export default async function AdminDashboardPage() {
 
       {/* Analytics Insights Charts Section */}
       <AnalyticsCharts data={analyticsData} />
+
+      {/* Admin Quick Notes & To-Do Scratchpad */}
+      <AdminNotesWidget />
 
       {/* 1-Click Data Backup & Restore Section */}
       <DataBackupManager />

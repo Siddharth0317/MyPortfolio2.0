@@ -17,15 +17,11 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Links */}
         <div className="flex items-center gap-6 text-sm text-slate-400">
           <a href="#hero" className="hover:text-indigo-400 transition-colors">Home</a>
           <a href="#projects" className="hover:text-indigo-400 transition-colors">Projects</a>
           <a href="#timeline" className="hover:text-indigo-400 transition-colors">Timeline</a>
           <a href="#contact" className="hover:text-indigo-400 transition-colors">Contact</a>
-          <Link href="/admin" className="hover:text-indigo-400 flex items-center gap-1 transition-colors">
-            <Shield className="w-3.5 h-3.5 text-indigo-500" /> Admin
-          </Link>
         </div>
 
         {/* Back to Top */}

@@ -78,14 +78,6 @@ export default function Navbar({ onOpenTerminal, onOpenResume }: NavbarProps) {
               Resume
             </button>
           )}
-
-          <Link
-            href="/admin"
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-900/80 hover:bg-indigo-600/80 border border-slate-700/60 hover:border-indigo-500/50 rounded-xl transition-all duration-200 shadow-sm"
-          >
-            <Shield className="w-3.5 h-3.5 text-indigo-400" />
-            Admin
-          </Link>
         </div>
 
         <button
@@ -132,13 +124,6 @@ export default function Navbar({ onOpenTerminal, onOpenResume }: NavbarProps) {
                 <FileText className="w-4 h-4 text-indigo-400" /> View Resume
               </button>
             )}
-            <Link
-              href="/admin"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors shadow-lg shadow-indigo-600/30"
-            >
-              <Shield className="w-4 h-4" /> Admin Portal
-            </Link>
           </div>
         </div>
       )}

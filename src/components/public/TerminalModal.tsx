@@ -121,7 +121,6 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
               <div><span className="text-emerald-400 font-bold">theme [indigo|emerald|violet|amber|ocean]</span> : Accent glow theme</div>
               <div><span className="text-emerald-400 font-bold">contact</span> : Contact form info &amp; scroll</div>
               <div><span className="text-emerald-400 font-bold">whoami</span> : Print visitor session data</div>
-              <div><span className="text-emerald-400 font-bold">sudo</span> : Administrative privileges test</div>
               <div><span className="text-emerald-400 font-bold">clear</span> / <span className="text-emerald-400 font-bold">cls</span> : Clear terminal history</div>
               <div><span className="text-rose-400 font-bold">exit</span> / <span className="text-rose-400 font-bold">quit</span> : Close terminal modal</div>
             </div>
@@ -238,14 +237,6 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
             <p><span className="text-slate-500">Session User:</span> Visitor / Recruiter</p>
             <p><span className="text-slate-500">Execution Env:</span> Next.js App Router + V8 Web Runtime</p>
             <p><span className="text-slate-500">Timestamp:</span> {new Date().toLocaleTimeString()}</p>
-          </div>
-        );
-        break;
-
-      case "sudo":
-        output = (
-          <div className="text-xs text-rose-400 font-semibold">
-            [ACCESS DENIED] User is not in the sudoers file. Log in at /admin with authorized credentials.
           </div>
         );
         break;

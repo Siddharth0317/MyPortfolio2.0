@@ -15,6 +15,13 @@ export default function ContactForm() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
+  const triggerBadgeUnlock = () => {
+    if (typeof window !== "undefined") {
+      const evt = new CustomEvent("unlock-badge", { detail: "inquirer" });
+      window.dispatchEvent(evt);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -32,6 +39,8 @@ export default function ContactForm() {
       if (!res.ok) {
         throw new Error(data.error || "Failed to send message.");
       }
+
+      triggerBadgeUnlock();
 
       setStatus({
         type: "success",

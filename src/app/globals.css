@@ -6,8 +6,42 @@
   :root {
     --background: 11 15 25;
     --foreground: 248 250 252;
+    --primary-color: #6366f1;
+    --primary-glow: rgba(99, 102, 241, 0.35);
+    --secondary-color: #a855f7;
   }
-  
+
+  /* Theme Presets */
+  html.theme-indigo {
+    --primary-color: #6366f1;
+    --primary-glow: rgba(99, 102, 241, 0.35);
+    --secondary-color: #a855f7;
+  }
+
+  html.theme-emerald {
+    --primary-color: #10b981;
+    --primary-glow: rgba(16, 185, 129, 0.35);
+    --secondary-color: #06b6d4;
+  }
+
+  html.theme-violet {
+    --primary-color: #ec4899;
+    --primary-glow: rgba(236, 72, 153, 0.35);
+    --secondary-color: #8b5cf6;
+  }
+
+  html.theme-amber {
+    --primary-color: #f59e0b;
+    --primary-glow: rgba(245, 158, 11, 0.35);
+    --secondary-color: #ef4444;
+  }
+
+  html.theme-ocean {
+    --primary-color: #3b82f6;
+    --primary-glow: rgba(59, 130, 246, 0.35);
+    --secondary-color: #06b6d4;
+  }
+
   body {
     background-color: #0b0f19;
     color: #f8fafc;
@@ -28,7 +62,7 @@
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #6366f1;
+  background: var(--primary-color);
 }
 
 /* Glassmorphism Styles */
@@ -45,8 +79,8 @@
 }
 .glass-card-hover:hover {
   transform: translateY(-4px);
-  border-color: rgba(99, 102, 241, 0.4);
-  box-shadow: 0 12px 40px -10px rgba(99, 102, 241, 0.3);
+  border-color: var(--primary-glow);
+  box-shadow: 0 12px 40px -10px var(--primary-glow);
 }
 
 .glass-nav {
@@ -64,26 +98,28 @@
 }
 .glass-input:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-glow);
 }
 
-/* Ambient Background Glow */
+/* Dynamic Ambient Background Glow */
 .bg-glow-purple {
   position: absolute;
   width: 500px;
   height: 500px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+  background: radial-gradient(circle, var(--primary-glow) 0%, rgba(0, 0, 0, 0) 70%);
   filter: blur(60px);
   pointer-events: none;
+  transition: background 0.5s ease;
 }
 .bg-glow-cyan {
   position: absolute;
   width: 400px;
   height: 400px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
+  background: radial-gradient(circle, var(--primary-glow) 0%, rgba(0, 0, 0, 0) 70%);
   filter: blur(60px);
   pointer-events: none;
+  transition: background 0.5s ease;
 }

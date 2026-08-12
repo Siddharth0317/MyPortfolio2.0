@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowDownRight, Download, Mail, Sparkles, Code2 } from "lucide-react";
+import { ArrowDownRight, Mail, Code2, FileText } from "lucide-react";
 import { GithubIcon, LinkedinIcon, TwitterIcon } from "@/components/common/SocialIcons";
 
 interface HeroProps {
@@ -14,9 +14,10 @@ interface HeroProps {
     linkedinUrl?: string;
     twitterUrl?: string;
   };
+  onResumeClick?: () => void;
 }
 
-export default function Hero({ profile }: HeroProps) {
+export default function Hero({ profile, onResumeClick }: HeroProps) {
   const name = profile?.name || "Alex Dev";
   const title = profile?.title || "Senior Full-Stack Engineer & System Architect";
   const bio = profile?.bio || "Building high-performance web applications, distributed microservices, and modern digital experiences with Next.js, React, Node.js, and Cloud technologies.";
@@ -26,7 +27,9 @@ export default function Hero({ profile }: HeroProps) {
   const twitterUrl = profile?.twitterUrl || "https://twitter.com";
 
   const handleDownloadResume = () => {
-    if (resumeUrl && resumeUrl !== "#") {
+    if (onResumeClick) {
+      onResumeClick();
+    } else if (resumeUrl && resumeUrl !== "#") {
       window.open(resumeUrl, "_blank");
     } else {
       const element = document.createElement("a");
@@ -102,8 +105,8 @@ export default function Hero({ profile }: HeroProps) {
             onClick={handleDownloadResume}
             className="flex items-center gap-2 px-6 py-3.5 rounded-xl glass-card hover:bg-white/10 border border-slate-700/80 text-white font-semibold text-sm transition-all duration-200 hover:border-indigo-500/50 hover:scale-[1.02]"
           >
-            <Download className="w-4 h-4 text-indigo-400" />
-            Download Resume
+            <FileText className="w-4 h-4 text-indigo-400" />
+            View &amp; Download Resume
           </button>
 
           <a

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { User, Mail, FileText, Image as ImageIcon, Check, Loader2 } from "lucide-react";
 import { GithubIcon, LinkedinIcon, TwitterIcon } from "@/components/common/SocialIcons";
+import ImageUploader from "@/components/admin/ImageUploader";
 
 export default function AdminProfilePage() {
   const [loading, setLoading] = useState(true);
@@ -139,32 +140,24 @@ export default function AdminProfilePage() {
           />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
-              Avatar Image URL
-            </label>
-            <input
-              type="url"
-              value={formData.avatarUrl}
-              onChange={(e) => setFormData({ ...formData, avatarUrl: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl glass-input text-sm"
-              placeholder="https://..."
-            />
-          </div>
+        <ImageUploader
+          value={formData.avatarUrl}
+          onChange={(url) => setFormData({ ...formData, avatarUrl: url })}
+          label="Profile Avatar Image"
+          placeholder="https://..."
+        />
 
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
-              Resume PDF Download URL
-            </label>
-            <input
-              type="text"
-              value={formData.resumeUrl}
-              onChange={(e) => setFormData({ ...formData, resumeUrl: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl glass-input text-sm"
-              placeholder="https://drive.google.com/... or /resume.pdf"
-            />
-          </div>
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
+            Resume PDF Download Link / Google Drive URL
+          </label>
+          <input
+            type="text"
+            value={formData.resumeUrl}
+            onChange={(e) => setFormData({ ...formData, resumeUrl: e.target.value })}
+            className="w-full px-4 py-3 rounded-xl glass-input text-sm"
+            placeholder="https://drive.google.com/... or /resume.pdf"
+          />
         </div>
 
         <div className="pt-4 border-t border-white/5 space-y-4">

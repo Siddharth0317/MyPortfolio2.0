@@ -73,6 +73,19 @@ export default function ProjectsShowcase({ projects = defaultProjects }: Project
     ? projects
     : projects.filter((p) => p.category.toLowerCase() === activeCategory.toLowerCase());
 
+  const trackEvent = (id: string, action: "view" | "click") => {
+    fetch(`/api/projects/${id}/view`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action }),
+    }).catch(() => {});
+  };
+
+  const handleOpenDetails = (p: Project) => {
+    setSelectedProject(p);
+    trackEvent(p.id, "view");
+  };
+
   return (
     <section id="projects" className="py-24 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -168,7 +181,7 @@ export default function ProjectsShowcase({ projects = defaultProjects }: Project
                 {/* Card Actions Footer */}
                 <div className="px-6 pb-6 pt-2 border-t border-white/5 flex items-center justify-between gap-3">
                   <button
-                    onClick={() => setSelectedProject(project)}
+                    onClick={() => handleOpenDetails(project)}
                     className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 group/btn"
                   >
                     View Details
@@ -192,6 +205,7 @@ export default function ProjectsShowcase({ projects = defaultProjects }: Project
                         href={project.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() => trackEvent(project.id, "click")}
                         className="p-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors shadow-md shadow-indigo-600/30"
                         title="Live Demo"
                       >
@@ -270,6 +284,7 @@ export default function ProjectsShowcase({ projects = defaultProjects }: Project
                       href={selectedProject.liveUrl}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={() => trackEvent(selectedProject.id, "click")}
                       className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-colors shadow-lg shadow-indigo-600/30"
                     >
                       <ExternalLink className="w-4 h-4" /> Live Demo

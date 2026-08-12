@@ -1,10 +1,4 @@
-import Navbar from "@/components/public/Navbar";
-import Hero from "@/components/public/Hero";
-import About from "@/components/public/About";
-import ProjectsShowcase from "@/components/public/ProjectsShowcase";
-import Timeline from "@/components/public/Timeline";
-import ContactForm from "@/components/public/ContactForm";
-import Footer from "@/components/public/Footer";
+import PortfolioClientWrapper from "@/components/public/PortfolioClientWrapper";
 import { prisma } from "@/lib/prisma";
 
 export const revalidate = 60; // Revalidate every 60 seconds
@@ -83,13 +77,12 @@ export default async function PublicPortfolioPage() {
 
   return (
     <main className="min-h-screen bg-[#0b0f19] text-slate-100 selection:bg-indigo-500 selection:text-white">
-      <Navbar />
-      <Hero profile={profile} />
-      <About bio={profile?.bio} skills={skills.length > 0 ? skills : undefined} />
-      <ProjectsShowcase projects={projects.length > 0 ? projects : undefined} />
-      <Timeline achievements={achievements.length > 0 ? achievements : undefined} />
-      <ContactForm />
-      <Footer />
+      <PortfolioClientWrapper
+        profile={profile}
+        projects={projects.length > 0 ? projects : undefined}
+        skills={skills.length > 0 ? skills : undefined}
+        achievements={achievements.length > 0 ? achievements : undefined}
+      />
     </main>
   );
 }

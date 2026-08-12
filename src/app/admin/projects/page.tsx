@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, Eye, EyeOff, Search, ExternalLink, Loader2, Sparkles, X, Check } from "lucide-react";
 import { GithubIcon } from "@/components/common/SocialIcons";
+import ImageUploader from "@/components/admin/ImageUploader";
 
 interface Project {
   id: string;
@@ -352,16 +353,13 @@ export default function AdminProjectsPage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold uppercase text-slate-300 mb-1">Cover Image URL</label>
-                <input
-                  type="url"
-                  value={formData.imageUrl}
-                  onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl glass-input text-sm"
-                  placeholder="https://images.unsplash.com/photo-..."
-                />
-              </div>
+              {/* Drag-and-Drop Image Uploader Integration */}
+              <ImageUploader
+                value={formData.imageUrl}
+                onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+                label="Project Cover Image"
+                placeholder="https://images.unsplash.com/photo-..."
+              />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>

@@ -27,6 +27,12 @@ async function getData() {
           githubUrl: rawProfile.githubUrl || undefined,
           linkedinUrl: rawProfile.linkedinUrl || undefined,
           twitterUrl: rawProfile.twitterUrl || undefined,
+          yearsExperience: rawProfile.yearsExperience || "6+",
+          codeQuality: rawProfile.codeQuality || "99%",
+          customProjectsCount: rawProfile.customProjectsCount || undefined,
+          customCertsCount: rawProfile.customCertsCount || undefined,
+          totalProjectsInDb: rawProjects.length,
+          totalCertsInDb: rawAchievements.length,
         }
       : undefined;
 

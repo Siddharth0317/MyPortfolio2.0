@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Mail, FileText, Image as ImageIcon, Check, Loader2 } from "lucide-react";
+import { User, Mail, FileText, Image as ImageIcon, Check, Loader2, Zap, Layers, CheckCircle2, Award } from "lucide-react";
 import { GithubIcon, LinkedinIcon, TwitterIcon } from "@/components/common/SocialIcons";
 import ImageUploader from "@/components/admin/ImageUploader";
 
@@ -19,6 +19,10 @@ export default function AdminProfilePage() {
     githubUrl: "",
     linkedinUrl: "",
     twitterUrl: "",
+    yearsExperience: "6+",
+    codeQuality: "99%",
+    customProjectsCount: "",
+    customCertsCount: "",
   });
 
   const fetchProfile = async () => {
@@ -36,6 +40,10 @@ export default function AdminProfilePage() {
           githubUrl: data.githubUrl || "",
           linkedinUrl: data.linkedinUrl || "",
           twitterUrl: data.twitterUrl || "",
+          yearsExperience: data.yearsExperience || "6+",
+          codeQuality: data.codeQuality || "99%",
+          customProjectsCount: data.customProjectsCount || "",
+          customCertsCount: data.customCertsCount || "",
         });
       }
     } catch (err) {
@@ -62,7 +70,7 @@ export default function AdminProfilePage() {
       });
 
       if (res.ok) {
-        setMessage("Profile details updated successfully!");
+        setMessage("Profile & About section stats updated successfully!");
       } else {
         setMessage("Failed to update profile.");
       }
@@ -86,12 +94,12 @@ export default function AdminProfilePage() {
     <div className="space-y-8 max-w-4xl">
       <div className="pb-6 border-b border-white/10">
         <h1 className="text-3xl font-extrabold text-white">Profile &amp; Info Manager</h1>
-        <p className="text-sm text-slate-400">Update your hero headline, bio, avatar, resume download link, and social media handles.</p>
+        <p className="text-sm text-slate-400">Update your hero headline, bio, About section statistics, avatar, resume download link, and social handles.</p>
       </div>
 
       {message && (
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium">
-          {message}
+        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium flex items-center gap-2">
+          <Check className="w-4 h-4" /> {message}
         </div>
       )}
 
@@ -123,6 +131,68 @@ export default function AdminProfilePage() {
               className="w-full px-4 py-3 rounded-xl glass-input text-sm"
               placeholder="Senior Full-Stack Engineer & System Architect"
             />
+          </div>
+        </div>
+
+        {/* Dynamic About Section Highlights Cards */}
+        <div className="pt-4 border-t border-white/5 space-y-4">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-2">
+            <Zap className="w-4 h-4" /> Public &quot;About&quot; Section Stat Cards
+          </h3>
+          <p className="text-xs text-slate-400">Customize the stat numbers shown on your public About section cards.</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+                <Zap className="w-3.5 h-3.5 text-indigo-400" /> Years Experience
+              </label>
+              <input
+                type="text"
+                value={formData.yearsExperience}
+                onChange={(e) => setFormData({ ...formData, yearsExperience: e.target.value })}
+                className="w-full px-3 py-2.5 rounded-xl glass-input text-xs"
+                placeholder="6+"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Code Quality %
+              </label>
+              <input
+                type="text"
+                value={formData.codeQuality}
+                onChange={(e) => setFormData({ ...formData, codeQuality: e.target.value })}
+                className="w-full px-3 py-2.5 rounded-xl glass-input text-xs"
+                placeholder="99%"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5 text-purple-400" /> Projects Stat
+              </label>
+              <input
+                type="text"
+                value={formData.customProjectsCount}
+                onChange={(e) => setFormData({ ...formData, customProjectsCount: e.target.value })}
+                className="w-full px-3 py-2.5 rounded-xl glass-input text-xs"
+                placeholder="Auto (or e.g. 35+)"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+                <Award className="w-3.5 h-3.5 text-amber-400" /> Certifications Stat
+              </label>
+              <input
+                type="text"
+                value={formData.customCertsCount}
+                onChange={(e) => setFormData({ ...formData, customCertsCount: e.target.value })}
+                className="w-full px-3 py-2.5 rounded-xl glass-input text-xs"
+                placeholder="Auto (or e.g. 5+)"
+              />
+            </div>
           </div>
         </div>
 

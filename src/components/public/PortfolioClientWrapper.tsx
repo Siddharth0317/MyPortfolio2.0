@@ -24,6 +24,12 @@ interface PortfolioClientWrapperProps {
     githubUrl?: string;
     linkedinUrl?: string;
     twitterUrl?: string;
+    yearsExperience?: string;
+    codeQuality?: string;
+    customProjectsCount?: string;
+    customCertsCount?: string;
+    totalProjectsInDb?: number;
+    totalCertsInDb?: number;
   };
   projects?: Project[];
   skills?: any[];
@@ -51,7 +57,16 @@ export default function PortfolioClientWrapper({
         onResumeClick={() => setIsResumeModalOpen(true)}
       />
 
-      <About bio={profile?.bio} skills={skills} />
+      <About
+        bio={profile?.bio}
+        skills={skills}
+        yearsExperience={profile?.yearsExperience}
+        codeQuality={profile?.codeQuality}
+        customProjectsCount={profile?.customProjectsCount}
+        customCertsCount={profile?.customCertsCount}
+        totalProjectsInDb={profile?.totalProjectsInDb}
+        totalCertsInDb={profile?.totalCertsInDb}
+      />
       <ProjectsShowcase projects={projects} />
       <Timeline achievements={achievements} />
       <ContactForm />

@@ -5,7 +5,6 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    // Return first user or default profile
     const user = await prisma.user.findFirst({
       select: {
         id: true,
@@ -18,6 +17,10 @@ export async function GET() {
         githubUrl: true,
         linkedinUrl: true,
         twitterUrl: true,
+        yearsExperience: true,
+        codeQuality: true,
+        customProjectsCount: true,
+        customCertsCount: true,
       },
     });
 
@@ -31,6 +34,10 @@ export async function GET() {
         githubUrl: "https://github.com",
         linkedinUrl: "https://linkedin.com",
         twitterUrl: "https://twitter.com",
+        yearsExperience: "6+",
+        codeQuality: "99%",
+        customProjectsCount: "",
+        customCertsCount: "",
       });
     }
 
@@ -66,6 +73,10 @@ export async function PUT(req: Request) {
         ...(body.githubUrl !== undefined && { githubUrl: body.githubUrl }),
         ...(body.linkedinUrl !== undefined && { linkedinUrl: body.linkedinUrl }),
         ...(body.twitterUrl !== undefined && { twitterUrl: body.twitterUrl }),
+        ...(body.yearsExperience !== undefined && { yearsExperience: body.yearsExperience }),
+        ...(body.codeQuality !== undefined && { codeQuality: body.codeQuality }),
+        ...(body.customProjectsCount !== undefined && { customProjectsCount: body.customProjectsCount }),
+        ...(body.customCertsCount !== undefined && { customCertsCount: body.customCertsCount }),
       },
       select: {
         id: true,
@@ -78,6 +89,10 @@ export async function PUT(req: Request) {
         githubUrl: true,
         linkedinUrl: true,
         twitterUrl: true,
+        yearsExperience: true,
+        codeQuality: true,
+        customProjectsCount: true,
+        customCertsCount: true,
       },
     });
 

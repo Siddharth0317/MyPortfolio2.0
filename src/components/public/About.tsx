@@ -15,6 +15,12 @@ interface Skill {
 interface AboutProps {
   bio?: string;
   skills?: Skill[];
+  yearsExperience?: string;
+  codeQuality?: string;
+  customProjectsCount?: string;
+  customCertsCount?: string;
+  totalProjectsInDb?: number;
+  totalCertsInDb?: number;
 }
 
 const defaultSkills: Skill[] = [
@@ -32,7 +38,16 @@ const defaultSkills: Skill[] = [
   { name: "Git & CI/CD Pipelines", category: "DevOps", proficiency: 90 },
 ];
 
-export default function About({ bio, skills = defaultSkills }: AboutProps) {
+export default function About({
+  bio,
+  skills = defaultSkills,
+  yearsExperience = "6+",
+  codeQuality = "99%",
+  customProjectsCount,
+  customCertsCount,
+  totalProjectsInDb,
+  totalCertsInDb,
+}: AboutProps) {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   const categories = ["All", "Frontend", "Backend", "Database", "DevOps"];
@@ -51,11 +66,19 @@ export default function About({ bio, skills = defaultSkills }: AboutProps) {
     }
   };
 
+  const displayProjectsCount = customProjectsCount && customProjectsCount.trim() !== ""
+    ? customProjectsCount
+    : (totalProjectsInDb !== undefined && totalProjectsInDb > 0 ? `${totalProjectsInDb}+` : "35+");
+
+  const displayCertsCount = customCertsCount && customCertsCount.trim() !== ""
+    ? customCertsCount
+    : (totalCertsInDb !== undefined && totalCertsInDb > 0 ? `${totalCertsInDb}+` : "5+");
+
   const stats = [
-    { label: "Years Experience", value: "6+", icon: <Zap className="w-5 h-5 text-indigo-400" /> },
-    { label: "Projects Completed", value: "35+", icon: <Layers className="w-5 h-5 text-purple-400" /> },
-    { label: "Code Quality & Tests", value: "99%", icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" /> },
-    { label: "Certifications", value: "5+", icon: <Award className="w-5 h-5 text-amber-400" /> },
+    { label: "Years Experience", value: yearsExperience || "6+", icon: <Zap className="w-5 h-5 text-indigo-400" /> },
+    { label: "Projects Completed", value: displayProjectsCount, icon: <Layers className="w-5 h-5 text-purple-400" /> },
+    { label: "Code Quality & Tests", value: codeQuality || "99%", icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" /> },
+    { label: "Certifications", value: displayCertsCount, icon: <Award className="w-5 h-5 text-amber-400" /> },
   ];
 
   return (
@@ -72,7 +95,7 @@ export default function About({ bio, skills = defaultSkills }: AboutProps) {
           </p>
         </div>
 
-        {/* Stats Grid */}
+        {/* Dynamic Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-16">
           {stats.map((stat, idx) => (
             <motion.div

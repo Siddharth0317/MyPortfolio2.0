@@ -1,7 +1,8 @@
 import PortfolioClientWrapper from "@/components/public/PortfolioClientWrapper";
 import { prisma } from "@/lib/prisma";
 
-export const revalidate = 60; // Revalidate every 60 seconds
+export const dynamic = "force-dynamic"; // Ensures Vercel always queries live Supabase database on every request
+export const revalidate = 0;
 
 async function getData() {
   try {

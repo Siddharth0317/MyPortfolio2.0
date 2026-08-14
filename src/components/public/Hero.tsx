@@ -8,6 +8,7 @@ interface HeroProps {
   profile?: {
     name?: string;
     title?: string;
+    tagline?: string;
     bio?: string;
     resumeUrl?: string;
     githubUrl?: string;
@@ -20,6 +21,7 @@ interface HeroProps {
 export default function Hero({ profile, onResumeClick }: HeroProps) {
   const name = profile?.name || "Siddharth";
   const title = profile?.title || "Senior Full-Stack Engineer & System Architect";
+  const tagline = profile?.tagline || "Architecting scalable cloud applications, distributed systems & AI-driven digital experiences.";
   const bio = profile?.bio || "Building high-performance web applications, distributed microservices, and modern digital experiences with Next.js, React, Node.js, and Cloud technologies.";
   const resumeUrl = profile?.resumeUrl || "#";
   const githubUrl = profile?.githubUrl || "https://github.com";
@@ -76,6 +78,17 @@ export default function Hero({ profile, onResumeClick }: HeroProps) {
             {title}
           </span>
         </motion.h1>
+
+        {tagline && (
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="text-base sm:text-lg text-cyan-400/90 font-medium mb-6 max-w-3xl mx-auto"
+          >
+            {tagline}
+          </motion.p>
+        )}
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}

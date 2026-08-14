@@ -75,7 +75,7 @@ export default function About({
     : (totalCertsInDb !== undefined && totalCertsInDb > 0 ? `${totalCertsInDb}+` : "5+");
 
   const stats = [
-    { label: "Years Experience", value: yearsExperience || "6+", icon: <Zap className="w-5 h-5 text-indigo-400" /> },
+    { label: "Hands-on Practice", value: yearsExperience || "2+ Years", icon: <Zap className="w-5 h-5 text-indigo-400" /> },
     { label: "Projects Completed", value: displayProjectsCount, icon: <Layers className="w-5 h-5 text-purple-400" /> },
     { label: "Code Quality & Tests", value: codeQuality || "99%", icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" /> },
     { label: "Certifications", value: displayCertsCount, icon: <Award className="w-5 h-5 text-amber-400" /> },

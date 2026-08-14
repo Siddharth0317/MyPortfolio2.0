@@ -17,6 +17,7 @@ model User {
   passwordHash        String
   name                String
   title               String
+  tagline             String?  @default("Architecting scalable cloud applications, distributed systems & AI-driven digital experiences.")
   bio                 String
   avatarUrl           String?
   resumeUrl           String?

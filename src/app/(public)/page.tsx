@@ -23,6 +23,7 @@ async function getData() {
       ? {
           name: rawProfile.name,
           title: rawProfile.title,
+          tagline: rawProfile.tagline || undefined,
           bio: rawProfile.bio,
           resumeUrl: rawProfile.resumeUrl || undefined,
           githubUrl: rawProfile.githubUrl || undefined,

@@ -13,6 +13,7 @@ export default function AdminProfilePage() {
   const [formData, setFormData] = useState({
     name: "",
     title: "",
+    tagline: "",
     bio: "",
     avatarUrl: "",
     resumeUrl: "",
@@ -34,6 +35,7 @@ export default function AdminProfilePage() {
         setFormData({
           name: data.name || "",
           title: data.title || "",
+          tagline: data.tagline || "",
           bio: data.bio || "",
           avatarUrl: data.avatarUrl || "",
           resumeUrl: data.resumeUrl || "",
@@ -132,6 +134,19 @@ export default function AdminProfilePage() {
               placeholder="Senior Full-Stack Engineer & System Architect"
             />
           </div>
+
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
+              Subtitle Tagline
+            </label>
+            <input
+              type="text"
+              value={formData.tagline}
+              onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
+              className="w-full px-4 py-3 rounded-xl glass-input text-sm"
+              placeholder="Architecting scalable cloud applications, distributed systems & AI-driven digital experiences."
+            />
+          </div>
         </div>
 
         {/* Dynamic About Section Highlights Cards */}
@@ -144,14 +159,14 @@ export default function AdminProfilePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
-                <Zap className="w-3.5 h-3.5 text-indigo-400" /> Years Experience
+                <Zap className="w-3.5 h-3.5 text-indigo-400" /> Hands-on Practice
               </label>
               <input
                 type="text"
                 value={formData.yearsExperience}
                 onChange={(e) => setFormData({ ...formData, yearsExperience: e.target.value })}
                 className="w-full px-3 py-2.5 rounded-xl glass-input text-xs"
-                placeholder="6+"
+                placeholder="2+ Years"
               />
             </div>
 

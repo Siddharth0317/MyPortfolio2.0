@@ -12,6 +12,7 @@ async function getData() {
       orderBy: { order: "asc" },
     });
     const rawSkills = await prisma.skill.findMany({
+      where: { isHidden: false },
       orderBy: { order: "asc" },
     });
     const rawAchievements = await prisma.achievement.findMany({

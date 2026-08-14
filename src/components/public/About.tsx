@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Code2, Server, Database, Cpu, Wrench, CheckCircle2, Award, Zap, Layers } from "lucide-react";
+import { Code2, Server, Database, Cpu, Wrench, CheckCircle2, Award, Zap, Layers, Terminal, Binary, Bot, Sparkles } from "lucide-react";
 
 interface Skill {
   id?: string;
@@ -10,6 +10,7 @@ interface Skill {
   category: string;
   iconName?: string;
   proficiency: number;
+  isHidden?: boolean;
 }
 
 interface AboutProps {
@@ -24,7 +25,18 @@ interface AboutProps {
 }
 
 const defaultSkills: Skill[] = [
-  { name: "TypeScript", category: "Frontend", proficiency: 95 },
+  { name: "TypeScript", category: "Programming Languages", proficiency: 95 },
+  { name: "Python", category: "Programming Languages", proficiency: 90 },
+  { name: "JavaScript (ES6+)", category: "Programming Languages", proficiency: 95 },
+  { name: "C++ / Systems Programming", category: "Programming Languages", proficiency: 85 },
+  { name: "Data Structures & Algorithms", category: "CS Fundamentals", proficiency: 92 },
+  { name: "System Design & Architecture", category: "CS Fundamentals", proficiency: 90 },
+  { name: "Object-Oriented Programming (OOP)", category: "CS Fundamentals", proficiency: 95 },
+  { name: "Networking & HTTP Protocols", category: "CS Fundamentals", proficiency: 88 },
+  { name: "Gemini AI API & Multimodal LLMs", category: "AI Automations", proficiency: 95 },
+  { name: "Autonomous AI Agents & Workflows", category: "AI Automations", proficiency: 90 },
+  { name: "Prompt Engineering & RAG", category: "AI Automations", proficiency: 92 },
+  { name: "Automated Data Processing Pipelines", category: "AI Automations", proficiency: 88 },
   { name: "Next.js (App Router)", category: "Frontend", proficiency: 95 },
   { name: "React", category: "Frontend", proficiency: 92 },
   { name: "Tailwind CSS", category: "Frontend", proficiency: 95 },
@@ -32,10 +44,8 @@ const defaultSkills: Skill[] = [
   { name: "REST & GraphQL APIs", category: "Backend", proficiency: 88 },
   { name: "PostgreSQL & Prisma", category: "Database", proficiency: 88 },
   { name: "Supabase", category: "Database", proficiency: 90 },
-  { name: "Redis Caching", category: "Database", proficiency: 80 },
   { name: "Docker & Containers", category: "DevOps", proficiency: 85 },
   { name: "AWS & Cloud Infrastructure", category: "DevOps", proficiency: 82 },
-  { name: "Git & CI/CD Pipelines", category: "DevOps", proficiency: 90 },
 ];
 
 export default function About({
@@ -50,17 +60,23 @@ export default function About({
 }: AboutProps) {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const categories = ["All", "Frontend", "Backend", "Database", "DevOps"];
+  const activeSkills = skills.filter((s) => !s.isHidden);
+  
+  const rawCategories = Array.from(new Set(activeSkills.map((s) => s.category)));
+  const categories = ["All", ...rawCategories];
 
   const filteredSkills = selectedCategory === "All"
-    ? skills
-    : skills.filter((s) => s.category.toLowerCase() === selectedCategory.toLowerCase());
+    ? activeSkills
+    : activeSkills.filter((s) => s.category.toLowerCase() === selectedCategory.toLowerCase());
 
-  const getCategoryIcon = (cat: string) => {
+    const getCategoryIcon = (cat: string) => {
     switch (cat.toLowerCase()) {
+      case "programming languages": return <Terminal className="w-4 h-4 text-emerald-400" />;
+      case "cs fundamentals": return <Binary className="w-4 h-4 text-cyan-400" />;
+      case "ai automations": return <Bot className="w-4 h-4 text-amber-400" />;
       case "frontend": return <Code2 className="w-4 h-4 text-indigo-400" />;
       case "backend": return <Server className="w-4 h-4 text-purple-400" />;
-      case "database": return <Database className="w-4 h-4 text-cyan-400" />;
+      case "database": return <Database className="w-4 h-4 text-blue-400" />;
       case "devops": return <Cpu className="w-4 h-4 text-pink-400" />;
       default: return <Wrench className="w-4 h-4 text-slate-400" />;
     }

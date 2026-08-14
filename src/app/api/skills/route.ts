@@ -3,9 +3,13 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const includeHidden = searchParams.get("all") === "true";
+
     const skills = await prisma.skill.findMany({
+      where: includeHidden ? {} : { isHidden: false },
       orderBy: { order: "asc" },
     });
     const response = NextResponse.json(skills);
@@ -25,7 +29,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { name, category, iconName, proficiency, order } = body;
+    const { name, category, iconName, proficiency, isHidden, order } = body;
 
     if (!name || !category) {
       return NextResponse.json({ error: "Name and category are required" }, { status: 400 });
@@ -37,6 +41,7 @@ export async function POST(req: Request) {
         category,
         iconName,
         proficiency: proficiency ? parseInt(proficiency) : 80,
+        isHidden: isHidden !== undefined ? Boolean(isHidden) : false,
         order: order ? parseInt(order) : 0,
       },
     });

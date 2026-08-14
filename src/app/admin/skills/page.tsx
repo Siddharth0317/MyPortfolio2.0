@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Loader2, Wrench, X, Check, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, Edit, Trash2, Loader2, Wrench, X, Check, ArrowUp, ArrowDown, Eye, EyeOff } from "lucide-react";
 
 interface Skill {
   id: string;
@@ -9,6 +9,7 @@ interface Skill {
   category: string;
   iconName?: string | null;
   proficiency: number;
+  isHidden?: boolean;
   order: number;
 }
 
@@ -24,15 +25,16 @@ export default function AdminSkillsPage() {
   // Form State
   const [formData, setFormData] = useState({
     name: "",
-    category: "Frontend",
+    category: "Programming Languages",
     proficiency: "85",
+    isHidden: false,
     order: "0",
   });
 
   const fetchSkills = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/skills");
+      const res = await fetch("/api/skills?all=true");
       const data = await res.json();
       if (Array.isArray(data)) setSkills(data);
     } catch (err) {
@@ -82,7 +84,8 @@ export default function AdminSkillsPage() {
     setEditingSkill(null);
     setFormData({
       name: "",
-      category: "Frontend",
+      category: "Programming Languages",
+      isHidden: false,
       proficiency: "85",
       order: (skills.length + 1).toString(),
     });
@@ -96,6 +99,7 @@ export default function AdminSkillsPage() {
       category: s.category,
       proficiency: s.proficiency.toString(),
       order: s.order.toString(),
+      isHidden: Boolean(s.isHidden),
     });
     setIsModalOpen(true);
   };
@@ -122,6 +126,38 @@ export default function AdminSkillsPage() {
       console.error("Failed to save skill:", err);
     } finally {
       setSaving(false);
+    }
+  };
+
+    const handleToggleHideSkill = async (s: Skill) => {
+    try {
+      const updated = !s.isHidden;
+      const res = await fetch(`/api/skills/${s.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isHidden: updated }),
+      });
+      if (res.ok) fetchSkills();
+    } catch (err) {
+      console.error("Failed to toggle skill visibility:", err);
+    }
+  };
+
+  const handleToggleCategoryHide = async (category: string, hide: boolean) => {
+    const categorySkills = skills.filter((s) => s.category === category);
+    try {
+      await Promise.all(
+        categorySkills.map((s) =>
+          fetch(`/api/skills/${s.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ isHidden: hide }),
+          })
+        )
+      );
+      fetchSkills();
+    } catch (err) {
+      console.error("Failed to toggle category visibility:", err);
     }
   };
 
@@ -169,9 +205,30 @@ export default function AdminSkillsPage() {
             const categorySkills = skills.filter((s) => s.category === cat);
             return (
               <div key={cat} className="glass-card p-6 rounded-3xl border border-white/10">
-                <h3 className="text-lg font-bold text-white mb-4 pb-2 border-b border-white/5 flex items-center gap-2">
-                  <Wrench className="w-4 h-4 text-indigo-400" /> {cat} ({categorySkills.length})
-                </h3>
+                <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/5">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Wrench className="w-4 h-4 text-indigo-400" /> {cat} ({categorySkills.length})
+                    {categorySkills.every(s => s.isHidden) && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                        Section Hidden
+                      </span>
+                    )}
+                  </h3>
+                  <button
+                    onClick={() => handleToggleCategoryHide(cat, !categorySkills.every(s => s.isHidden))}
+                    className="px-3 py-1 rounded-lg text-xs font-semibold glass-card hover:bg-white/10 text-slate-300 border border-white/10 flex items-center gap-1.5 transition-colors"
+                  >
+                    {categorySkills.every(s => s.isHidden) ? (
+                      <>
+                        <Eye className="w-3.5 h-3.5 text-emerald-400" /> Show Section
+                      </>
+                    ) : (
+                      <>
+                        <EyeOff className="w-3.5 h-3.5 text-rose-400" /> Hide Section
+                      </>
+                    )}
+                  </button>
+                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {categorySkills.map((s, index) => (
@@ -213,6 +270,13 @@ export default function AdminSkillsPage() {
                       </div>
 
                       <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={() => handleToggleHideSkill(s)}
+                          className={`p-1.5 rounded-lg transition-colors ${s.isHidden ? "text-rose-400 bg-rose-500/10 hover:bg-rose-500/20" : "text-slate-400 hover:text-white hover:bg-slate-800"}`}
+                          title={s.isHidden ? "Unhide Skill" : "Hide Skill"}
+                        >
+                          {s.isHidden ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        </button>
                         <button
                           onClick={() => handleOpenEditModal(s)}
                           className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
@@ -270,6 +334,9 @@ export default function AdminSkillsPage() {
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-xl glass-input text-sm bg-slate-900 text-white"
                 >
+                  <option value="Programming Languages">Programming Languages</option>
+                  <option value="CS Fundamentals">CS Fundamentals</option>
+                  <option value="AI Automations">AI Automations</option>
                   <option value="Frontend">Frontend</option>
                   <option value="Backend">Backend</option>
                   <option value="Database">Database</option>
@@ -292,6 +359,19 @@ export default function AdminSkillsPage() {
                   onChange={(e) => setFormData({ ...formData, proficiency: e.target.value })}
                   className="w-full accent-indigo-600 cursor-pointer"
                 />
+              </div>
+
+                            <div className="flex items-center gap-2 py-2">
+                <input
+                  type="checkbox"
+                  id="isHidden"
+                  checked={formData.isHidden}
+                  onChange={(e) => setFormData({ ...formData, isHidden: e.target.checked })}
+                  className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                />
+                <label htmlFor="isHidden" className="text-xs font-semibold text-slate-300 cursor-pointer">
+                  Hide from public website portfolio
+                </label>
               </div>
 
               <div>

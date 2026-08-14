@@ -9,6 +9,7 @@ export default function AdminProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [savedProfile, setSavedProfile] = useState<any>({});
 
   const [formData, setFormData] = useState({
     name: "",
@@ -20,8 +21,8 @@ export default function AdminProfilePage() {
     githubUrl: "",
     linkedinUrl: "",
     twitterUrl: "",
-    yearsExperience: "6+",
-    codeQuality: "99%",
+    yearsExperience: "",
+    codeQuality: "",
     customProjectsCount: "",
     customCertsCount: "",
   });
@@ -32,6 +33,7 @@ export default function AdminProfilePage() {
       const res = await fetch("/api/profile");
       const data = await res.json();
       if (data && !data.error) {
+        setSavedProfile(data);
         setFormData({
           name: data.name || "",
           title: data.title || "",
@@ -42,8 +44,8 @@ export default function AdminProfilePage() {
           githubUrl: data.githubUrl || "",
           linkedinUrl: data.linkedinUrl || "",
           twitterUrl: data.twitterUrl || "",
-          yearsExperience: data.yearsExperience || "6+",
-          codeQuality: data.codeQuality || "99%",
+          yearsExperience: data.yearsExperience || "",
+          codeQuality: data.codeQuality || "",
           customProjectsCount: data.customProjectsCount || "",
           customCertsCount: data.customCertsCount || "",
         });
@@ -72,6 +74,8 @@ export default function AdminProfilePage() {
       });
 
       if (res.ok) {
+        const updated = await res.json();
+        setSavedProfile(updated);
         setMessage("Profile & About section stats updated successfully!");
       } else {
         setMessage("Failed to update profile.");
@@ -96,7 +100,7 @@ export default function AdminProfilePage() {
     <div className="space-y-8 max-w-4xl">
       <div className="pb-6 border-b border-white/10">
         <h1 className="text-3xl font-extrabold text-white">Profile &amp; Info Manager</h1>
-        <p className="text-sm text-slate-400">Update your hero headline, bio, About section statistics, avatar, resume download link, and social handles.</p>
+        <p className="text-sm text-slate-400">Update your hero headline, subtitle tagline, bio, About section statistics, avatar, resume download link, and social handles.</p>
       </div>
 
       {message && (
@@ -117,7 +121,7 @@ export default function AdminProfilePage() {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full px-4 py-3 rounded-xl glass-input text-sm"
-              placeholder="Alex Dev"
+              placeholder={savedProfile.name || "e.g. Siddharth"}
             />
           </div>
 
@@ -131,11 +135,11 @@ export default function AdminProfilePage() {
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               className="w-full px-4 py-3 rounded-xl glass-input text-sm"
-              placeholder="Senior Full-Stack Engineer & System Architect"
+              placeholder={savedProfile.title || "Senior Full-Stack Engineer & System Architect"}
             />
           </div>
 
-          <div>
+          <div className="sm:col-span-2">
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
               Subtitle Tagline
             </label>
@@ -144,7 +148,7 @@ export default function AdminProfilePage() {
               value={formData.tagline}
               onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
               className="w-full px-4 py-3 rounded-xl glass-input text-sm"
-              placeholder="Architecting scalable cloud applications, distributed systems & AI-driven digital experiences."
+              placeholder={savedProfile.tagline || "Architecting scalable cloud applications, distributed systems & AI-driven digital experiences."}
             />
           </div>
         </div>
@@ -166,7 +170,7 @@ export default function AdminProfilePage() {
                 value={formData.yearsExperience}
                 onChange={(e) => setFormData({ ...formData, yearsExperience: e.target.value })}
                 className="w-full px-3 py-2.5 rounded-xl glass-input text-xs"
-                placeholder="2+ Years"
+                placeholder={savedProfile.yearsExperience || "2+ Years"}
               />
             </div>
 
@@ -179,7 +183,7 @@ export default function AdminProfilePage() {
                 value={formData.codeQuality}
                 onChange={(e) => setFormData({ ...formData, codeQuality: e.target.value })}
                 className="w-full px-3 py-2.5 rounded-xl glass-input text-xs"
-                placeholder="99%"
+                placeholder={savedProfile.codeQuality || "99%"}
               />
             </div>
 
@@ -192,7 +196,7 @@ export default function AdminProfilePage() {
                 value={formData.customProjectsCount}
                 onChange={(e) => setFormData({ ...formData, customProjectsCount: e.target.value })}
                 className="w-full px-3 py-2.5 rounded-xl glass-input text-xs"
-                placeholder="Auto (or e.g. 35+)"
+                placeholder={savedProfile.customProjectsCount || "Auto (or e.g. 35+)"}
               />
             </div>
 
@@ -205,7 +209,7 @@ export default function AdminProfilePage() {
                 value={formData.customCertsCount}
                 onChange={(e) => setFormData({ ...formData, customCertsCount: e.target.value })}
                 className="w-full px-3 py-2.5 rounded-xl glass-input text-xs"
-                placeholder="Auto (or e.g. 5+)"
+                placeholder={savedProfile.customCertsCount || "Auto (or e.g. 5+)"}
               />
             </div>
           </div>
@@ -221,7 +225,7 @@ export default function AdminProfilePage() {
             value={formData.bio}
             onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
             className="w-full px-4 py-3 rounded-xl glass-input text-sm resize-none"
-            placeholder="Passionate engineer with experience building web applications..."
+            placeholder={savedProfile.bio || "Passionate engineer with experience building web applications..."}
           />
         </div>
 
@@ -229,7 +233,7 @@ export default function AdminProfilePage() {
           value={formData.avatarUrl}
           onChange={(url) => setFormData({ ...formData, avatarUrl: url })}
           label="Profile Avatar Image"
-          placeholder="https://..."
+          placeholder={savedProfile.avatarUrl || "https://..."}
         />
 
         <div>
@@ -241,7 +245,7 @@ export default function AdminProfilePage() {
             value={formData.resumeUrl}
             onChange={(e) => setFormData({ ...formData, resumeUrl: e.target.value })}
             className="w-full px-4 py-3 rounded-xl glass-input text-sm"
-            placeholder="https://drive.google.com/... or /resume.pdf"
+            placeholder={savedProfile.resumeUrl || "https://drive.google.com/... or /resume.pdf"}
           />
         </div>
 
@@ -258,7 +262,7 @@ export default function AdminProfilePage() {
                 value={formData.githubUrl}
                 onChange={(e) => setFormData({ ...formData, githubUrl: e.target.value })}
                 className="w-full px-3 py-2 rounded-xl glass-input text-xs"
-                placeholder="https://github.com/..."
+                placeholder={savedProfile.githubUrl || "https://github.com/..."}
               />
             </div>
 
@@ -271,7 +275,7 @@ export default function AdminProfilePage() {
                 value={formData.linkedinUrl}
                 onChange={(e) => setFormData({ ...formData, linkedinUrl: e.target.value })}
                 className="w-full px-3 py-2 rounded-xl glass-input text-xs"
-                placeholder="https://linkedin.com/in/..."
+                placeholder={savedProfile.linkedinUrl || "https://linkedin.com/in/..."}
               />
             </div>
 
@@ -284,7 +288,7 @@ export default function AdminProfilePage() {
                 value={formData.twitterUrl}
                 onChange={(e) => setFormData({ ...formData, twitterUrl: e.target.value })}
                 className="w-full px-3 py-2 rounded-xl glass-input text-xs"
-                placeholder="https://twitter.com/..."
+                placeholder={savedProfile.twitterUrl || "https://twitter.com/..."}
               />
             </div>
           </div>

@@ -10,6 +10,7 @@ interface Skill {
   category: string;
   iconName?: string;
   proficiency: number;
+  level?: string | null;
   isHidden?: boolean;
 }
 
@@ -187,16 +188,26 @@ export default function About({
                   </div>
                   <span className="font-semibold text-white text-sm">{skill.name}</span>
                 </div>
-                <span className="text-xs font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 rounded-full">
-                  {skill.proficiency}%
-                </span>
+                {skill.level && skill.level.trim() !== "" ? (
+                  <span className="text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2.5 py-1 rounded-full">
+                    {skill.level}
+                  </span>
+                ) : (
+                  <span className="text-xs font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 rounded-full">
+                    {skill.proficiency}%
+                  </span>
+                )}
               </div>
 
               {/* Progress Bar */}
               <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500"
-                  style={{ width: `${skill.proficiency}%` }}
+                  className={`h-full ${
+                    skill.level && skill.level.trim() !== ""
+                      ? "bg-gradient-to-r from-cyan-500 to-emerald-500"
+                      : "bg-gradient-to-r from-indigo-500 to-purple-500"
+                  } rounded-full transition-all duration-500`}
+                  style={{ width: `${skill.proficiency || 85}%` }}
                 />
               </div>
             </motion.div>

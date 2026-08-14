@@ -13,7 +13,7 @@ export async function GET(req: Request) {
       orderBy: { order: "asc" },
     });
     const response = NextResponse.json(skills);
-    response.headers.set("Cache-Control", "public, max-age=60, s-maxage=3600, stale-while-revalidate=86400");
+    response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
     return response;
   } catch (error: any) {
     console.error("Error fetching skills:", error);
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { name, category, iconName, proficiency, isHidden, order } = body;
+    const { name, category, iconName, proficiency, level, isHidden, order } = body;
 
     if (!name || !category) {
       return NextResponse.json({ error: "Name and category are required" }, { status: 400 });
@@ -41,6 +41,7 @@ export async function POST(req: Request) {
         category,
         iconName,
         proficiency: proficiency ? parseInt(proficiency) : 80,
+        level: level ? String(level).trim() : null,
         isHidden: isHidden !== undefined ? Boolean(isHidden) : false,
         order: order ? parseInt(order) : 0,
       },

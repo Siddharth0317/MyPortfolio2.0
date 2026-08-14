@@ -9,9 +9,21 @@ interface Skill {
   category: string;
   iconName?: string | null;
   proficiency: number;
+  level?: string | null;
   isHidden?: boolean;
   order: number;
 }
+
+const ALL_CATEGORIES = [
+  "Programming Languages",
+  "CS Fundamentals",
+  "AI Automations",
+  "Frontend",
+  "Backend",
+  "Database",
+  "DevOps",
+  "Tools",
+];
 
 export default function AdminSkillsPage() {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -27,6 +39,8 @@ export default function AdminSkillsPage() {
     name: "",
     category: "Programming Languages",
     proficiency: "85",
+    levelMode: "rating" as "rating" | "level",
+    level: "",
     isHidden: false,
     order: "0",
   });
@@ -34,7 +48,7 @@ export default function AdminSkillsPage() {
   const fetchSkills = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/skills?all=true");
+      const res = await fetch(`/api/skills?all=true&t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       if (Array.isArray(data)) setSkills(data);
     } catch (err) {
@@ -80,56 +94,7 @@ export default function AdminSkillsPage() {
     }
   };
 
-  const handleOpenAddModal = () => {
-    setEditingSkill(null);
-    setFormData({
-      name: "",
-      category: "Programming Languages",
-      isHidden: false,
-      proficiency: "85",
-      order: (skills.length + 1).toString(),
-    });
-    setIsModalOpen(true);
-  };
-
-  const handleOpenEditModal = (s: Skill) => {
-    setEditingSkill(s);
-    setFormData({
-      name: s.name,
-      category: s.category,
-      proficiency: s.proficiency.toString(),
-      order: s.order.toString(),
-      isHidden: Boolean(s.isHidden),
-    });
-    setIsModalOpen(true);
-  };
-
-  const handleSaveSkill = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-
-    try {
-      const url = editingSkill ? `/api/skills/${editingSkill.id}` : "/api/skills";
-      const method = editingSkill ? "PUT" : "POST";
-
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (res.ok) {
-        setIsModalOpen(false);
-        fetchSkills();
-      }
-    } catch (err) {
-      console.error("Failed to save skill:", err);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-    const handleToggleHideSkill = async (s: Skill) => {
+  const handleToggleHideSkill = async (s: Skill) => {
     try {
       const updated = !s.isHidden;
       const res = await fetch(`/api/skills/${s.id}`, {
@@ -171,8 +136,71 @@ export default function AdminSkillsPage() {
     }
   };
 
+  const handleOpenAddModal = (catName?: string | any) => {
+    const selectedCat = typeof catName === "string" ? catName : "Programming Languages";
+    setEditingSkill(null);
+    setFormData({
+      name: "",
+      category: selectedCat,
+      proficiency: "85",
+      levelMode: "rating",
+      level: "",
+      isHidden: false,
+      order: (skills.length + 1).toString(),
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (s: Skill) => {
+    setEditingSkill(s);
+    setFormData({
+      name: s.name,
+      category: s.category,
+      proficiency: s.proficiency.toString(),
+      levelMode: s.level && s.level.trim() !== "" ? "level" : "rating",
+      level: s.level || "",
+      order: s.order.toString(),
+      isHidden: Boolean(s.isHidden),
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleSaveSkill = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+
+    try {
+      const url = editingSkill ? `/api/skills/${editingSkill.id}` : "/api/skills";
+      const method = editingSkill ? "PUT" : "POST";
+
+      const payload = {
+        name: formData.name,
+        category: formData.category,
+        proficiency: parseInt(formData.proficiency) || 80,
+        level: formData.levelMode === "level" ? formData.level.trim() : null,
+        isHidden: formData.isHidden,
+        order: parseInt(formData.order) || 0,
+      };
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        setIsModalOpen(false);
+        fetchSkills();
+      }
+    } catch (err) {
+      console.error("Failed to save skill:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // Group skills by category
-  const categories = Array.from(new Set(skills.map((s) => s.category)));
+  const categories = Array.from(new Set([...ALL_CATEGORIES, ...skills.map((s) => s.category)]));
 
   return (
     <div className="space-y-8">
@@ -180,11 +208,11 @@ export default function AdminSkillsPage() {
       <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div>
           <h1 className="text-3xl font-extrabold text-white">Skills Matrix Manager</h1>
-          <p className="text-sm text-slate-400">Configure tech stack badges, reorder positions, categories, and proficiency percentages.</p>
+          <p className="text-sm text-slate-400">Configure tech stack badges, proficiency rating % or handwritten level text, categories, and visibility.</p>
         </div>
 
         <button
-          onClick={handleOpenAddModal}
+          onClick={() => handleOpenAddModal()}
           className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-all duration-200 shadow-lg shadow-indigo-600/30 flex items-center gap-2"
         >
           <Plus className="w-4 h-4" /> Add Skill
@@ -195,7 +223,7 @@ export default function AdminSkillsPage() {
         <div className="py-20 text-center text-slate-400 flex items-center justify-center gap-2">
           <Loader2 className="w-5 h-5 animate-spin text-indigo-400" /> Loading skills...
         </div>
-      ) : skills.length === 0 ? (
+      ) : skills.length === 0 && categories.length === 0 ? (
         <div className="glass-card p-12 rounded-3xl text-center text-slate-400 border border-white/10">
           No skills added yet. Click &quot;Add Skill&quot; to populate your tech matrix.
         </div>
@@ -203,22 +231,23 @@ export default function AdminSkillsPage() {
         <div className="space-y-8">
           {categories.map((cat) => {
             const categorySkills = skills.filter((s) => s.category === cat);
+            const isAllHidden = categorySkills.length > 0 && categorySkills.every((s) => s.isHidden);
             return (
               <div key={cat} className="glass-card p-6 rounded-3xl border border-white/10">
                 <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/5">
                   <h3 className="text-lg font-bold text-white flex items-center gap-2">
                     <Wrench className="w-4 h-4 text-indigo-400" /> {cat} ({categorySkills.length})
-                    {categorySkills.every(s => s.isHidden) && (
+                    {isAllHidden && (
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">
                         Section Hidden
                       </span>
                     )}
                   </h3>
                   <button
-                    onClick={() => handleToggleCategoryHide(cat, !categorySkills.every(s => s.isHidden))}
+                    onClick={() => handleToggleCategoryHide(cat, !isAllHidden)}
                     className="px-3 py-1 rounded-lg text-xs font-semibold glass-card hover:bg-white/10 text-slate-300 border border-white/10 flex items-center gap-1.5 transition-colors"
                   >
-                    {categorySkills.every(s => s.isHidden) ? (
+                    {isAllHidden ? (
                       <>
                         <Eye className="w-3.5 h-3.5 text-emerald-400" /> Show Section
                       </>
@@ -231,67 +260,83 @@ export default function AdminSkillsPage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {categorySkills.map((s, index) => (
-                    <div
-                      key={s.id}
-                      className="glass-card p-4 rounded-2xl border border-white/5 flex items-center justify-between gap-3 hover:border-indigo-500/30 transition-colors"
-                    >
-                      {/* Reorder Arrows */}
-                      <div className="flex flex-col gap-0.5 shrink-0">
-                        <button
-                          disabled={index === 0}
-                          onClick={() => handleReorder(cat, index, "up")}
-                          className="p-0.5 rounded bg-slate-900 text-slate-400 hover:text-white disabled:opacity-30 transition-colors"
-                          title="Move Up"
-                        >
-                          <ArrowUp className="w-3 h-3" />
-                        </button>
-                        <button
-                          disabled={index === categorySkills.length - 1}
-                          onClick={() => handleReorder(cat, index, "down")}
-                          className="p-0.5 rounded bg-slate-900 text-slate-400 hover:text-white disabled:opacity-30 transition-colors"
-                          title="Move Down"
-                        >
-                          <ArrowDown className="w-3 h-3" />
-                        </button>
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-semibold text-white text-sm truncate">{s.name}</span>
-                          <span className="text-xs font-bold text-indigo-400">{s.proficiency}%</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-indigo-500 rounded-full"
-                            style={{ width: `${s.proficiency}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-1 shrink-0">
-                        <button
-                          onClick={() => handleToggleHideSkill(s)}
-                          className={`p-1.5 rounded-lg transition-colors ${s.isHidden ? "text-rose-400 bg-rose-500/10 hover:bg-rose-500/20" : "text-slate-400 hover:text-white hover:bg-slate-800"}`}
-                          title={s.isHidden ? "Unhide Skill" : "Hide Skill"}
-                        >
-                          {s.isHidden ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                        </button>
-                        <button
-                          onClick={() => handleOpenEditModal(s)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-                        >
-                          <Edit className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteSkill(s.id)}
-                          className="p-1.5 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-colors"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                  {categorySkills.length === 0 ? (
+                    <div className="col-span-full py-6 text-center text-slate-500 text-xs flex flex-col items-center justify-center gap-2 bg-slate-950/40 rounded-2xl border border-dashed border-white/10">
+                      <span>No skills added to {cat} section yet.</span>
+                      <button
+                        onClick={() => handleOpenAddModal(cat)}
+                        className="px-3 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-xs font-semibold border border-indigo-500/30 transition-colors flex items-center gap-1"
+                      >
+                        <Plus className="w-3.5 h-3.5" /> Add {cat} Skill
+                      </button>
                     </div>
-                  ))}
+                  ) : (
+                    categorySkills.map((s, index) => (
+                      <div
+                        key={s.id}
+                        className="glass-card p-4 rounded-2xl border border-white/5 flex items-center justify-between gap-3 hover:border-indigo-500/30 transition-colors"
+                      >
+                        {/* Reorder Arrows */}
+                        <div className="flex flex-col gap-0.5 shrink-0">
+                          <button
+                            disabled={index === 0}
+                            onClick={() => handleReorder(cat, index, "up")}
+                            className="p-0.5 rounded bg-slate-900 text-slate-400 hover:text-white disabled:opacity-30 transition-colors"
+                            title="Move Up"
+                          >
+                            <ArrowUp className="w-3 h-3" />
+                          </button>
+                          <button
+                            disabled={index === categorySkills.length - 1}
+                            onClick={() => handleReorder(cat, index, "down")}
+                            className="p-0.5 rounded bg-slate-900 text-slate-400 hover:text-white disabled:opacity-30 transition-colors"
+                            title="Move Down"
+                          >
+                            <ArrowDown className="w-3 h-3" />
+                          </button>
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-semibold text-white text-sm truncate">{s.name}</span>
+                            {s.level && s.level.trim() !== "" ? (
+                              <span className="text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded-full">{s.level}</span>
+                            ) : (
+                              <span className="text-xs font-bold text-indigo-400">{s.proficiency}%</span>
+                            )}
+                          </div>
+                          <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${s.level && s.level.trim() !== "" ? "bg-cyan-500" : "bg-indigo-500"} rounded-full`}
+                              style={{ width: `${s.proficiency || 85}%` }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={() => handleToggleHideSkill(s)}
+                            className={`p-1.5 rounded-lg transition-colors ${s.isHidden ? "text-rose-400 bg-rose-500/10 hover:bg-rose-500/20" : "text-slate-400 hover:text-white hover:bg-slate-800"}`}
+                            title={s.isHidden ? "Unhide Skill" : "Hide Skill"}
+                          >
+                            {s.isHidden ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                          </button>
+                          <button
+                            onClick={() => handleOpenEditModal(s)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteSkill(s.id)}
+                            className="p-1.5 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             );
@@ -345,23 +390,67 @@ export default function AdminSkillsPage() {
                 </select>
               </div>
 
+              {/* Display Mode Selection: Rating % vs Handwritten Level */}
               <div>
-                <div className="flex justify-between items-center mb-1">
-                  <label className="text-xs font-bold uppercase text-slate-300">Proficiency Rating</label>
-                  <span className="text-xs font-bold text-indigo-400">{formData.proficiency}%</span>
+                <label className="block text-xs font-bold uppercase text-slate-300 mb-2">Proficiency Display Format</label>
+                <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-slate-900 border border-slate-800 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, levelMode: "rating" })}
+                    className={`py-2 rounded-lg text-xs font-bold transition-all ${
+                      formData.levelMode === "rating"
+                        ? "bg-indigo-600 text-white shadow-md"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    Numeric % Rating
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, levelMode: "level" })}
+                    className={`py-2 rounded-lg text-xs font-bold transition-all ${
+                      formData.levelMode === "level"
+                        ? "bg-cyan-600 text-white shadow-md"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    Handwritten Level
+                  </button>
                 </div>
-                <input
-                  type="range"
-                  min="10"
-                  max="100"
-                  step="5"
-                  value={formData.proficiency}
-                  onChange={(e) => setFormData({ ...formData, proficiency: e.target.value })}
-                  className="w-full accent-indigo-600 cursor-pointer"
-                />
+
+                {formData.levelMode === "rating" ? (
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="text-xs font-semibold text-slate-300">Proficiency Rating</label>
+                      <span className="text-xs font-bold text-indigo-400">{formData.proficiency}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="10"
+                      max="100"
+                      step="5"
+                      value={formData.proficiency}
+                      onChange={(e) => setFormData({ ...formData, proficiency: e.target.value })}
+                      className="w-full accent-indigo-600 cursor-pointer"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Custom Handwritten Level *</label>
+                    <input
+                      type="text"
+                      required={formData.levelMode === "level"}
+                      value={formData.level}
+                      onChange={(e) => setFormData({ ...formData, level: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl glass-input text-sm"
+                      placeholder="e.g. Advanced / Expert / Production-Ready / Hands-On"
+                    />
+                    <p className="text-[11px] text-slate-400 mt-1">Type any custom level text you want displayed on your portfolio badge.</p>
+                  </div>
+                )}
               </div>
 
-                            <div className="flex items-center gap-2 py-2">
+              <div className="flex items-center gap-2 py-2">
                 <input
                   type="checkbox"
                   id="isHidden"

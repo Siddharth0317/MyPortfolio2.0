@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// GET /api/projects - Public route to fetch all projects with Cache-Control optimization
+// GET /api/projects - Public route to fetch all projects
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -27,9 +27,7 @@ export async function GET(req: Request) {
     });
 
     const response = NextResponse.json(projects);
-    if (!isAuthorized) {
-      response.headers.set("Cache-Control", "public, max-age=60, s-maxage=3600, stale-while-revalidate=86400");
-    }
+    response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
     return response;
   } catch (error: any) {
     console.error("Error fetching projects:", error);

@@ -20,6 +20,7 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
         ...(body.category && { category: body.category }),
         ...(body.iconName !== undefined && { iconName: body.iconName }),
         ...(body.proficiency !== undefined && { proficiency: parseInt(body.proficiency) }),
+        ...(body.level !== undefined && { level: body.level ? String(body.level).trim() : null }),
         ...(body.isHidden !== undefined && { isHidden: Boolean(body.isHidden) }),
         ...(body.order !== undefined && { order: parseInt(body.order) }),
       },

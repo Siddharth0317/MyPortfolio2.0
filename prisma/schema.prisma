@@ -57,6 +57,7 @@ model Skill {
   category    String   // "Programming Languages", "CS Fundamentals", "AI Automations", "Frontend", "Backend", "Database", "DevOps"
   iconName    String?
   proficiency Int      @default(80)
+  level       String?  // Custom handwritten proficiency level text (e.g. "Advanced", "Expert", "Intermediate")
   isHidden    Boolean  @default(false)
   order       Int      @default(0)
   createdAt   DateTime @default(now())

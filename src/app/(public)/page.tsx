@@ -15,6 +15,9 @@ async function getData() {
       where: { isHidden: false },
       orderBy: { order: "asc" },
     });
+    const rawSkillCategories = await prisma.skillCategory.findMany({
+      orderBy: { order: "asc" },
+    });
     const rawAchievements = await prisma.achievement.findMany({
       where: { isHidden: false },
       orderBy: { order: "asc" },
@@ -60,6 +63,13 @@ async function getData() {
       category: s.category,
       iconName: s.iconName || undefined,
       proficiency: s.proficiency,
+      level: s.level || undefined,
+    }));
+
+    const skillCategories = rawSkillCategories.map((c) => ({
+      id: c.id,
+      name: c.name,
+      order: c.order,
     }));
 
     const achievements = rawAchievements.map((a) => ({
@@ -74,15 +84,15 @@ async function getData() {
       order: a.order,
     }));
 
-    return { profile, projects, skills, achievements };
+    return { profile, projects, skills, skillCategories, achievements };
   } catch (error) {
     console.warn("Could not query DB for public portfolio, falling back to defaults:", error);
-    return { profile: undefined, projects: [], skills: [], achievements: [] };
+    return { profile: undefined, projects: [], skills: [], skillCategories: [], achievements: [] };
   }
 }
 
 export default async function PublicPortfolioPage() {
-  const { profile, projects, skills, achievements } = await getData();
+  const { profile, projects, skills, skillCategories, achievements } = await getData();
 
   return (
     <main className="min-h-screen bg-[#0b0f19] text-slate-100 selection:bg-indigo-500 selection:text-white">
@@ -90,6 +100,7 @@ export default async function PublicPortfolioPage() {
         profile={profile}
         projects={projects.length > 0 ? projects : undefined}
         skills={skills.length > 0 ? skills : undefined}
+        skillCategories={skillCategories.length > 0 ? skillCategories : undefined}
         achievements={achievements.length > 0 ? achievements : undefined}
       />
     </main>

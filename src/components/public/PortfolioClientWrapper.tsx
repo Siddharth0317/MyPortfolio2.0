@@ -36,6 +36,7 @@ interface PortfolioClientWrapperProps {
   };
   projects?: Project[];
   skills?: any[];
+  skillCategories?: any[];
   achievements?: Achievement[];
 }
 
@@ -43,6 +44,7 @@ export default function PortfolioClientWrapper({
   profile,
   projects,
   skills,
+  skillCategories,
   achievements,
 }: PortfolioClientWrapperProps) {
   const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
@@ -63,6 +65,7 @@ export default function PortfolioClientWrapper({
       <About
         bio={profile?.bio}
         skills={skills}
+        skillCategories={skillCategories}
         yearsExperience={profile?.yearsExperience}
         codeQuality={profile?.codeQuality}
         customProjectsCount={profile?.customProjectsCount}

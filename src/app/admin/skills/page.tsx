@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Loader2, Wrench, X, Check, ArrowUp, ArrowDown, Eye, EyeOff } from "lucide-react";
+import { Plus, Edit, Trash2, Loader2, Wrench, X, Check, ArrowUp, ArrowDown, Eye, EyeOff, Layers, ArrowLeft, ArrowRight } from "lucide-react";
 
 interface Skill {
   id: string;
@@ -14,7 +14,14 @@ interface Skill {
   order: number;
 }
 
-const ALL_CATEGORIES = [
+interface SkillCategory {
+  id?: string;
+  name: string;
+  order: number;
+  isHidden?: boolean;
+}
+
+const DEFAULT_CATEGORIES = [
   "Programming Languages",
   "CS Fundamentals",
   "AI Automations",
@@ -27,6 +34,7 @@ const ALL_CATEGORIES = [
 
 export default function AdminSkillsPage() {
   const [skills, setSkills] = useState<Skill[]>([]);
+  const [categoriesList, setCategoriesList] = useState<SkillCategory[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Modal States
@@ -45,37 +53,67 @@ export default function AdminSkillsPage() {
     order: "0",
   });
 
-  const fetchSkills = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/skills?all=true&t=${Date.now()}`, { cache: "no-store" });
-      const data = await res.json();
-      if (Array.isArray(data)) setSkills(data);
+      const [skillsRes, catRes] = await Promise.all([
+        fetch(`/api/skills?all=true&t=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/skill-categories?t=${Date.now()}`, { cache: "no-store" }),
+      ]);
+
+      const skillsData = await skillsRes.json();
+      const catData = await catRes.json();
+
+      if (Array.isArray(skillsData)) setSkills(skillsData);
+      if (Array.isArray(catData)) setCategoriesList(catData);
     } catch (err) {
-      console.error("Failed to fetch skills:", err);
+      console.error("Failed to fetch skills/categories:", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchSkills();
+    fetchData();
   }, []);
 
+  // Category Section Reordering
+  const handleReorderCategory = async (catIndex: number, direction: "up" | "down") => {
+    const targetIndex = direction === "up" ? catIndex - 1 : catIndex + 1;
+    if (targetIndex < 0 || targetIndex >= categoriesList.length) return;
+
+    const updated = [...categoriesList];
+    const temp = updated[catIndex];
+    updated[catIndex] = updated[targetIndex];
+    updated[targetIndex] = temp;
+
+    const reorderedItems = updated.map((c, idx) => ({ name: c.name, order: idx + 1 }));
+    setCategoriesList(updated.map((c, idx) => ({ ...c, order: idx + 1 })));
+
+    try {
+      await fetch("/api/skill-categories/reorder", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: reorderedItems }),
+      });
+    } catch (err) {
+      console.error("Failed to reorder categories:", err);
+      fetchData();
+    }
+  };
+
+  // Skill Item Reordering within Category
   const handleReorder = async (category: string, index: number, direction: "up" | "down") => {
     const categorySkills = skills.filter((s) => s.category === category);
     const targetIndex = direction === "up" ? index - 1 : index + 1;
     if (targetIndex < 0 || targetIndex >= categorySkills.length) return;
 
-    // Swap positions
     const temp = categorySkills[index];
     categorySkills[index] = categorySkills[targetIndex];
     categorySkills[targetIndex] = temp;
 
-    // Reassign order
     const updatedItems = categorySkills.map((s, idx) => ({ id: s.id, order: idx + 1 }));
 
-    // Optimistic state update
     const updatedSkills = skills.map((s) => {
       const match = updatedItems.find((u) => u.id === s.id);
       return match ? { ...s, order: match.order } : s;
@@ -90,7 +128,7 @@ export default function AdminSkillsPage() {
       });
     } catch (err) {
       console.error("Failed to reorder skills:", err);
-      fetchSkills();
+      fetchData();
     }
   };
 
@@ -102,7 +140,7 @@ export default function AdminSkillsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isHidden: updated }),
       });
-      if (res.ok) fetchSkills();
+      if (res.ok) fetchData();
     } catch (err) {
       console.error("Failed to toggle skill visibility:", err);
     }
@@ -120,7 +158,7 @@ export default function AdminSkillsPage() {
           })
         )
       );
-      fetchSkills();
+      fetchData();
     } catch (err) {
       console.error("Failed to toggle category visibility:", err);
     }
@@ -130,14 +168,14 @@ export default function AdminSkillsPage() {
     if (!confirm("Delete this skill from matrix?")) return;
     try {
       const res = await fetch(`/api/skills/${id}`, { method: "DELETE" });
-      if (res.ok) fetchSkills();
+      if (res.ok) fetchData();
     } catch (err) {
       console.error("Failed to delete skill:", err);
     }
   };
 
   const handleOpenAddModal = (catName?: string | any) => {
-    const selectedCat = typeof catName === "string" ? catName : "Programming Languages";
+    const selectedCat = typeof catName === "string" ? catName : (categoriesList[0]?.name || "Programming Languages");
     setEditingSkill(null);
     setFormData({
       name: "",
@@ -190,7 +228,7 @@ export default function AdminSkillsPage() {
 
       if (res.ok) {
         setIsModalOpen(false);
-        fetchSkills();
+        fetchData();
       }
     } catch (err) {
       console.error("Failed to save skill:", err);
@@ -199,16 +237,21 @@ export default function AdminSkillsPage() {
     }
   };
 
-  // Group skills by category
-  const categories = Array.from(new Set([...ALL_CATEGORIES, ...skills.map((s) => s.category)]));
+  // Determine ordered category list
+  const categoryNamesOrdered = categoriesList.length > 0
+    ? categoriesList.map((c) => c.name)
+    : DEFAULT_CATEGORIES;
+
+  // Add any unexpected category names from skills that aren't in categoryNamesOrdered
+  const allCategoryNames = Array.from(new Set([...categoryNamesOrdered, ...skills.map((s) => s.category)]));
 
   return (
     <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div>
-          <h1 className="text-3xl font-extrabold text-white">Skills Matrix Manager</h1>
-          <p className="text-sm text-slate-400">Configure tech stack badges, proficiency rating % or handwritten level text, categories, and visibility.</p>
+          <h1 className="text-3xl font-extrabold text-white">Skills Matrix &amp; Section Order Manager</h1>
+          <p className="text-sm text-slate-400">Reorder category sections (1st, 2nd, 3rd), set proficiency rating % or handwritten levels, and control visibility.</p>
         </div>
 
         <button
@@ -221,44 +264,75 @@ export default function AdminSkillsPage() {
 
       {loading ? (
         <div className="py-20 text-center text-slate-400 flex items-center justify-center gap-2">
-          <Loader2 className="w-5 h-5 animate-spin text-indigo-400" /> Loading skills...
+          <Loader2 className="w-5 h-5 animate-spin text-indigo-400" /> Loading skills &amp; sections...
         </div>
-      ) : skills.length === 0 && categories.length === 0 ? (
+      ) : skills.length === 0 && allCategoryNames.length === 0 ? (
         <div className="glass-card p-12 rounded-3xl text-center text-slate-400 border border-white/10">
           No skills added yet. Click &quot;Add Skill&quot; to populate your tech matrix.
         </div>
       ) : (
         <div className="space-y-8">
-          {categories.map((cat) => {
+          {allCategoryNames.map((cat, catIdx) => {
             const categorySkills = skills.filter((s) => s.category === cat);
             const isAllHidden = categorySkills.length > 0 && categorySkills.every((s) => s.isHidden);
             return (
-              <div key={cat} className="glass-card p-6 rounded-3xl border border-white/10">
-                <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/5">
-                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <Wrench className="w-4 h-4 text-indigo-400" /> {cat} ({categorySkills.length})
-                    {isAllHidden && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">
-                        Section Hidden
+              <div key={cat} className="glass-card p-6 rounded-3xl border border-white/10 relative group">
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
+                  
+                  {/* Category Title & Section Reorder Controls */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1">
+                      <button
+                        disabled={catIdx === 0}
+                        onClick={() => handleReorderCategory(catIdx, "up")}
+                        className="p-1 rounded text-slate-400 hover:text-white disabled:opacity-20 hover:bg-slate-800 transition-colors"
+                        title="Move Category Section Up"
+                      >
+                        <ArrowUp className="w-4 h-4 text-indigo-400" />
+                      </button>
+                      <button
+                        disabled={catIdx === allCategoryNames.length - 1}
+                        onClick={() => handleReorderCategory(catIdx, "down")}
+                        className="p-1 rounded text-slate-400 hover:text-white disabled:opacity-20 hover:bg-slate-800 transition-colors"
+                        title="Move Category Section Down"
+                      >
+                        <ArrowDown className="w-4 h-4 text-indigo-400" />
+                      </button>
+                    </div>
+
+                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                      <Wrench className="w-4 h-4 text-indigo-400" /> {cat}
+                      <span className="text-xs font-semibold text-slate-400 bg-slate-900 px-2 py-0.5 rounded-full border border-slate-800">
+                        {categorySkills.length} skills
                       </span>
-                    )}
-                  </h3>
-                  <button
-                    onClick={() => handleToggleCategoryHide(cat, !isAllHidden)}
-                    className="px-3 py-1 rounded-lg text-xs font-semibold glass-card hover:bg-white/10 text-slate-300 border border-white/10 flex items-center gap-1.5 transition-colors"
-                  >
-                    {isAllHidden ? (
-                      <>
-                        <Eye className="w-3.5 h-3.5 text-emerald-400" /> Show Section
-                      </>
-                    ) : (
-                      <>
-                        <EyeOff className="w-3.5 h-3.5 text-rose-400" /> Hide Section
-                      </>
-                    )}
-                  </button>
+                      {isAllHidden && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                          Section Hidden
+                        </span>
+                      )}
+                    </h3>
+                  </div>
+
+                  {/* Section Controls */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleToggleCategoryHide(cat, !isAllHidden)}
+                      className="px-3 py-1.5 rounded-xl text-xs font-semibold glass-card hover:bg-white/10 text-slate-300 border border-white/10 flex items-center gap-1.5 transition-colors"
+                    >
+                      {isAllHidden ? (
+                        <>
+                          <Eye className="w-3.5 h-3.5 text-emerald-400" /> Show Section
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff className="w-3.5 h-3.5 text-rose-400" /> Hide Section
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
 
+                {/* Skills Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {categorySkills.length === 0 ? (
                     <div className="col-span-full py-6 text-center text-slate-500 text-xs flex flex-col items-center justify-center gap-2 bg-slate-950/40 rounded-2xl border border-dashed border-white/10">
@@ -379,14 +453,9 @@ export default function AdminSkillsPage() {
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-xl glass-input text-sm bg-slate-900 text-white"
                 >
-                  <option value="Programming Languages">Programming Languages</option>
-                  <option value="CS Fundamentals">CS Fundamentals</option>
-                  <option value="AI Automations">AI Automations</option>
-                  <option value="Frontend">Frontend</option>
-                  <option value="Backend">Backend</option>
-                  <option value="Database">Database</option>
-                  <option value="DevOps">DevOps</option>
-                  <option value="Tools">Tools</option>
+                  {allCategoryNames.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
                 </select>
               </div>
 

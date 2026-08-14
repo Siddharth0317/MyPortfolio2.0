@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Code2, Server, Database, Cpu, Wrench, CheckCircle2, Award, Zap, Layers, Terminal, Binary, Bot, Sparkles } from "lucide-react";
+import { Code2, Server, Database, Cpu, Wrench, CheckCircle2, Award, Zap, Layers, Terminal, Binary, Bot, LayoutGrid, SlidersHorizontal } from "lucide-react";
 
 interface Skill {
   id?: string;
@@ -14,9 +14,16 @@ interface Skill {
   isHidden?: boolean;
 }
 
+interface SkillCategory {
+  id?: string;
+  name: string;
+  order: number;
+}
+
 interface AboutProps {
   bio?: string;
   skills?: Skill[];
+  skillCategories?: SkillCategory[];
   yearsExperience?: string;
   codeQuality?: string;
   customProjectsCount?: string;
@@ -33,25 +40,21 @@ const defaultSkills: Skill[] = [
   { name: "Data Structures & Algorithms", category: "CS Fundamentals", proficiency: 92 },
   { name: "System Design & Architecture", category: "CS Fundamentals", proficiency: 90 },
   { name: "Object-Oriented Programming (OOP)", category: "CS Fundamentals", proficiency: 95 },
-  { name: "Networking & HTTP Protocols", category: "CS Fundamentals", proficiency: 88 },
   { name: "Gemini AI API & Multimodal LLMs", category: "AI Automations", proficiency: 95 },
   { name: "Autonomous AI Agents & Workflows", category: "AI Automations", proficiency: 90 },
-  { name: "Prompt Engineering & RAG", category: "AI Automations", proficiency: 92 },
-  { name: "Automated Data Processing Pipelines", category: "AI Automations", proficiency: 88 },
   { name: "Next.js (App Router)", category: "Frontend", proficiency: 95 },
   { name: "React", category: "Frontend", proficiency: 92 },
   { name: "Tailwind CSS", category: "Frontend", proficiency: 95 },
   { name: "Node.js & Express", category: "Backend", proficiency: 90 },
-  { name: "REST & GraphQL APIs", category: "Backend", proficiency: 88 },
   { name: "PostgreSQL & Prisma", category: "Database", proficiency: 88 },
   { name: "Supabase", category: "Database", proficiency: 90 },
   { name: "Docker & Containers", category: "DevOps", proficiency: 85 },
-  { name: "AWS & Cloud Infrastructure", category: "DevOps", proficiency: 82 },
 ];
 
 export default function About({
   bio,
   skills = defaultSkills,
+  skillCategories = [],
   yearsExperience = "6+",
   codeQuality = "99%",
   customProjectsCount,
@@ -60,17 +63,24 @@ export default function About({
   totalCertsInDb,
 }: AboutProps) {
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [viewMode, setViewMode] = useState<"tabs" | "sections">("tabs");
 
   const activeSkills = skills.filter((s) => !s.isHidden);
-  
-  const rawCategories = Array.from(new Set(activeSkills.map((s) => s.category)));
-  const categories = ["All", ...rawCategories];
+
+  // Compute category order
+  let categories: string[] = [];
+  if (skillCategories && skillCategories.length > 0) {
+    const sorted = [...skillCategories].sort((a, b) => a.order - b.order);
+    categories = ["All", ...sorted.map((c) => c.name)];
+  } else {
+    categories = ["All", ...Array.from(new Set(activeSkills.map((s) => s.category)))];
+  }
 
   const filteredSkills = selectedCategory === "All"
     ? activeSkills
     : activeSkills.filter((s) => s.category.toLowerCase() === selectedCategory.toLowerCase());
 
-    const getCategoryIcon = (cat: string) => {
+  const getCategoryIcon = (cat: string) => {
     switch (cat.toLowerCase()) {
       case "programming languages": return <Terminal className="w-4 h-4 text-emerald-400" />;
       case "cs fundamentals": return <Binary className="w-4 h-4 text-cyan-400" />;
@@ -150,69 +160,152 @@ export default function About({
           </p>
         </motion.div>
 
-        {/* Skills Filter Tabs */}
-        <div className="mb-10">
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                  selectedCategory === cat
-                    ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 border border-indigo-500"
-                    : "glass-card text-slate-400 hover:text-white hover:bg-white/5 border border-white/5"
-                }`}
-              >
-                {getCategoryIcon(cat)}
-                {cat}
-              </button>
-            ))}
+        {/* Tech Stack Header & View Mode Switcher */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+          <h3 className="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-2">
+            <SlidersHorizontal className="w-5 h-5 text-indigo-400" /> Tech Matrix &amp; Proficiencies
+          </h3>
+
+          {/* View Toggle */}
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-900 border border-slate-800">
+            <button
+              onClick={() => setViewMode("tabs")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                viewMode === "tabs"
+                  ? "bg-indigo-600 text-white shadow-md"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" /> Filter Tabs
+            </button>
+            <button
+              onClick={() => setViewMode("sections")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                viewMode === "sections"
+                  ? "bg-indigo-600 text-white shadow-md"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" /> All Sections
+            </button>
           </div>
         </div>
 
-        {/* Skills Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredSkills.map((skill, idx) => (
-            <motion.div
-              key={skill.name}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, delay: idx * 0.05 }}
-              viewport={{ once: true }}
-              className="glass-card p-5 rounded-2xl border border-white/5 hover:border-indigo-500/40 transition-all duration-200"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                    {getCategoryIcon(skill.category)}
-                  </div>
-                  <span className="font-semibold text-white text-sm">{skill.name}</span>
-                </div>
-                {skill.level && skill.level.trim() !== "" ? (
-                  <span className="text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2.5 py-1 rounded-full">
-                    {skill.level}
-                  </span>
-                ) : (
-                  <span className="text-xs font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 rounded-full">
-                    {skill.proficiency}%
-                  </span>
-                )}
+        {viewMode === "tabs" ? (
+          <div>
+            {/* Sleek Non-Wrapping Horizontal Scroll Pill Bar */}
+            <div className="mb-10 relative">
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-0.5 max-w-full">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                      selectedCategory === cat
+                        ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 border border-indigo-500"
+                        : "glass-card text-slate-400 hover:text-white hover:bg-white/5 border border-white/5"
+                    }`}
+                  >
+                    {getCategoryIcon(cat)}
+                    {cat}
+                  </button>
+                ))}
               </div>
+            </div>
 
-              {/* Progress Bar */}
-              <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
-                <div
-                  className={`h-full ${
-                    skill.level && skill.level.trim() !== ""
-                      ? "bg-gradient-to-r from-cyan-500 to-emerald-500"
-                      : "bg-gradient-to-r from-indigo-500 to-purple-500"
-                  } rounded-full transition-all duration-500`}
-                  style={{ width: `${skill.proficiency || 85}%` }}
-                />
-              </div>
-            </motion.div>
-          ))}
-        </div>
+            {/* Skills Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredSkills.map((skill, idx) => (
+                <motion.div
+                  key={skill.name}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: idx * 0.04 }}
+                  viewport={{ once: true }}
+                  className="glass-card p-5 rounded-2xl border border-white/5 hover:border-indigo-500/40 transition-all duration-200"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-slate-900 border border-slate-800">
+                        {getCategoryIcon(skill.category)}
+                      </div>
+                      <span className="font-semibold text-white text-sm">{skill.name}</span>
+                    </div>
+                    {skill.level && skill.level.trim() !== "" ? (
+                      <span className="text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2.5 py-1 rounded-full">
+                        {skill.level}
+                      </span>
+                    ) : (
+                      <span className="text-xs font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 rounded-full">
+                        {skill.proficiency}%
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full ${
+                        skill.level && skill.level.trim() !== ""
+                          ? "bg-gradient-to-r from-cyan-500 to-emerald-500"
+                          : "bg-gradient-to-r from-indigo-500 to-purple-500"
+                      } rounded-full transition-all duration-500`}
+                      style={{ width: `${skill.proficiency || 85}%` }}
+                    />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          /* Grouped Categorized Section Matrix View */
+          <div className="space-y-8">
+            {categories.filter((c) => c !== "All").map((catName) => {
+              const catSkills = activeSkills.filter((s) => s.category === catName);
+              if (catSkills.length === 0) return null;
+
+              return (
+                <div key={catName} className="glass-card p-6 rounded-3xl border border-white/10">
+                  <h4 className="text-lg font-bold text-white mb-4 pb-2 border-b border-white/5 flex items-center gap-2">
+                    {getCategoryIcon(catName)} {catName} ({catSkills.length})
+                  </h4>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {catSkills.map((skill) => (
+                      <div
+                        key={skill.name}
+                        className="glass-card p-4 rounded-2xl border border-white/5 hover:border-indigo-500/40 transition-all duration-200"
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="font-semibold text-white text-sm">{skill.name}</span>
+                          {skill.level && skill.level.trim() !== "" ? (
+                            <span className="text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2.5 py-1 rounded-full">
+                              {skill.level}
+                            </span>
+                          ) : (
+                            <span className="text-xs font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 rounded-full">
+                              {skill.proficiency}%
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full ${
+                              skill.level && skill.level.trim() !== ""
+                                ? "bg-gradient-to-r from-cyan-500 to-emerald-500"
+                                : "bg-gradient-to-r from-indigo-500 to-purple-500"
+                            } rounded-full`}
+                            style={{ width: `${skill.proficiency || 85}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
       </div>
     </section>

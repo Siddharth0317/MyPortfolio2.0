@@ -56,8 +56,8 @@ export default function About({
   skills = defaultSkills,
   skillCategories = [],
   yearsExperience = "6+",
-  codeQuality = "99%",
-  customProjectsCount,
+  codeQuality = "80+%",
+  customProjectsCount = "15+",
   customCertsCount,
   totalProjectsInDb,
   totalCertsInDb,
@@ -102,16 +102,16 @@ export default function About({
 
   const displayProjectsCount = customProjectsCount && customProjectsCount.trim() !== ""
     ? customProjectsCount
-    : (totalProjectsInDb !== undefined && totalProjectsInDb > 0 ? `${totalProjectsInDb}+` : "35+");
+    : (totalProjectsInDb !== undefined && totalProjectsInDb > 15 ? `${totalProjectsInDb}+` : "15+");
 
   const displayCertsCount = customCertsCount && customCertsCount.trim() !== ""
     ? customCertsCount
-    : (totalCertsInDb !== undefined && totalCertsInDb > 0 ? `${totalCertsInDb}+` : "5+");
+    : (totalCertsInDb !== undefined && totalCertsInDb > 0 ? `${totalCertsInDb}+` : "10+");
 
   const stats = [
     { label: "Hands-on Practice", value: yearsExperience || "2+ Years", icon: <Zap className="w-5 h-5 text-indigo-400" /> },
     { label: "Projects Completed", value: displayProjectsCount, icon: <Layers className="w-5 h-5 text-purple-400" /> },
-    { label: "Code Quality & Tests", value: codeQuality || "99%", icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" /> },
+    { label: "Code Quality & Tests", value: codeQuality || "80+%", icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" /> },
     { label: "Certifications", value: displayCertsCount, icon: <Award className="w-5 h-5 text-amber-400" /> },
   ];
 

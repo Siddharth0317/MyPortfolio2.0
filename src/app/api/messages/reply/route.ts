@@ -33,7 +33,7 @@ export async function POST(req: Request) {
             <div style="white-space: pre-wrap; background: #f8fafc; padding: 16px; border-left: 4px solid #6366f1; border-radius: 8px; margin: 16px 0;">
               ${replyText}
             </div>
-            <p>Best regards,<br/><strong>${senderName}</strong><br/>${profile?.title || "Senior Full-Stack Engineer"}</p>
+            <p>Best regards,<br/><strong>${senderName}</strong><br/>${profile?.title || "Full Stack Engineer and AI Enthusiast"}</p>
             <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
             <p style="font-size: 12px; color: #64748b;">Sent directly from ${senderName}'s Developer Portfolio Admin Panel.</p>
           </div>

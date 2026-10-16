@@ -7,19 +7,22 @@ const DEFAULT_PROFILE = {
   email: process.env.ADMIN_EMAIL || "inftpaths@gmail.com",
   passwordHash: "$2a$10$w8T0M0W2t9xL0.90xM.u.e0V7X6b4n2k3m5l7p9q0r1s2t3u4v5w",
   name: "Siddharth",
-  title: "Senior Full-Stack Engineer & System Architect",
+  title: "Full Stack Engineer and AI Enthusiast",
   tagline: "Architecting scalable cloud applications, distributed systems & AI-driven digital experiences.",
-  bio: "Passionate Senior Full-Stack Engineer building high-scale web applications and interactive developer tooling.",
+  bio: "Passionate Full Stack Engineer and AI Enthusiast building high-scale web applications and interactive developer tooling.",
   avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
-  resumeUrl: "#",
+  resumeUrl: "/resume.pdf",
   githubUrl: "https://github.com",
   linkedinUrl: "https://linkedin.com",
   twitterUrl: "https://twitter.com",
   yearsExperience: "2+ Years",
-  codeQuality: "99%",
-  customProjectsCount: "",
+  codeQuality: "80+%",
+  customProjectsCount: "15+",
   customCertsCount: "",
 };
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET() {
   try {

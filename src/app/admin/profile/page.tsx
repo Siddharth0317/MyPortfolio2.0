@@ -135,7 +135,7 @@ export default function AdminProfilePage() {
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               className="w-full px-4 py-3 rounded-xl glass-input text-sm"
-              placeholder={savedProfile.title || "Senior Full-Stack Engineer & System Architect"}
+              placeholder={savedProfile.title || "Full Stack Engineer and AI Enthusiast"}
             />
           </div>
 
@@ -183,7 +183,7 @@ export default function AdminProfilePage() {
                 value={formData.codeQuality}
                 onChange={(e) => setFormData({ ...formData, codeQuality: e.target.value })}
                 className="w-full px-3 py-2.5 rounded-xl glass-input text-xs"
-                placeholder={savedProfile.codeQuality || "99%"}
+                placeholder={savedProfile.codeQuality || "80+%"}
               />
             </div>
 
@@ -196,7 +196,7 @@ export default function AdminProfilePage() {
                 value={formData.customProjectsCount}
                 onChange={(e) => setFormData({ ...formData, customProjectsCount: e.target.value })}
                 className="w-full px-3 py-2.5 rounded-xl glass-input text-xs"
-                placeholder={savedProfile.customProjectsCount || "Auto (or e.g. 35+)"}
+                placeholder={savedProfile.customProjectsCount || "Auto (or e.g. 15+)"}
               />
             </div>
 

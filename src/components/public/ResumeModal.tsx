@@ -27,16 +27,22 @@ export default function ResumeModal({ isOpen, onClose, profile }: ResumeModalPro
 
   if (!isOpen) return null;
 
-  const name = profile?.name || "Alex Dev";
-  const title = profile?.title || "Senior Full-Stack Engineer & System Architect";
-  const bio = profile?.bio || "Senior Full-Stack Engineer with 6+ years of experience building high-scale web applications, microservices, and interactive developer tooling.";
-  const resumeUrl = profile?.resumeUrl;
+  const name = profile?.name || "Siddharth";
+  const title = profile?.title || "Full Stack Engineer and AI Enthusiast";
+  const bio = profile?.bio || "Full Stack Engineer and AI Enthusiast building high-scale web applications, microservices, and interactive developer tooling.";
+  const resumeUrl = (profile?.resumeUrl && profile.resumeUrl !== "#") ? profile.resumeUrl : "/resume.pdf";
 
-  const hasPdfFile = resumeUrl && resumeUrl !== "#" && (resumeUrl.endsWith(".pdf") || resumeUrl.includes("drive.google.com") || resumeUrl.includes("http"));
+  const hasPdfFile = Boolean(resumeUrl && (resumeUrl.endsWith(".pdf") || resumeUrl.includes("drive.google.com") || resumeUrl.includes("http") || resumeUrl === "/resume.pdf"));
 
   const handleDownload = () => {
     if (hasPdfFile) {
-      window.open(resumeUrl, "_blank");
+      const link = document.createElement("a");
+      link.href = resumeUrl;
+      link.download = `${name.replace(/\s+/g, "_")}_Resume.pdf`;
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } else {
       const element = document.createElement("a");
       const file = new Blob([

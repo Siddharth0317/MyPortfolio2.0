@@ -8,13 +8,13 @@ const inter = Inter({ subsets: ["latin"] });
 const siteUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
 
 export const metadata: Metadata = {
-  title: "Sid.dev | Senior Full-Stack Engineer & System Architect",
+  title: "Sid.dev | Full Stack Engineer and AI Enthusiast",
   description: "Dynamic developer portfolio featuring interactive project showcases, skill matrix, career timeline, CLI terminal, and admin management panel.",
   keywords: ["Full Stack Engineer", "React", "Next.js 16", "TypeScript", "Developer Portfolio", "Software Architect", "Prisma", "Supabase"],
   authors: [{ name: "Siddharth (Sid.dev)" }],
   metadataBase: new URL(siteUrl),
   openGraph: {
-    title: "Sid.dev | Senior Full-Stack Engineer",
+    title: "Sid.dev | Full Stack Engineer and AI Enthusiast",
     description: "Dynamic developer portfolio featuring interactive project showcases, skill matrix, career timeline, and CLI terminal.",
     url: siteUrl,
     siteName: "Sid.dev Portfolio",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
         url: "/api/og",
         width: 1200,
         height: 630,
-        alt: "Sid.dev - Senior Full-Stack Engineer Portfolio Preview",
+        alt: "Sid.dev - Full Stack Engineer and AI Enthusiast Portfolio Preview",
       },
     ],
     locale: "en_US",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sid.dev | Senior Full-Stack Engineer",
+    title: "Sid.dev | Full Stack Engineer and AI Enthusiast",
     description: "Dynamic developer portfolio featuring interactive project showcases, skill matrix, career timeline, and CLI terminal.",
     images: ["/api/og"],
   },

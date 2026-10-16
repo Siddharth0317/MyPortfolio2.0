@@ -5,8 +5,8 @@ export const runtime = "nodejs";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const title = searchParams.get("title") || "Sid.dev | Senior Full-Stack Engineer";
-    const bio = searchParams.get("bio") || "Full-Stack Engineer & System Architect. Building high-performance Next.js apps, distributed microservices, and modern web tooling.";
+    const title = searchParams.get("title") || "Sid.dev | Full Stack Engineer and AI Enthusiast";
+    const bio = searchParams.get("bio") || "Full Stack Engineer and AI Enthusiast. Building high-performance Next.js apps, AI workflows, and modern web tooling.";
 
     return new ImageResponse(
       (

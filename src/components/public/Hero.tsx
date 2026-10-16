@@ -20,10 +20,10 @@ interface HeroProps {
 
 export default function Hero({ profile, onResumeClick }: HeroProps) {
   const name = profile?.name || "Siddharth";
-  const title = profile?.title || "Senior Full-Stack Engineer & System Architect";
+  const title = profile?.title || "Full Stack Engineer and AI Enthusiast";
   const tagline = profile?.tagline || "Architecting scalable cloud applications, distributed systems & AI-driven digital experiences.";
   const bio = profile?.bio || "Building high-performance web applications, distributed microservices, and modern digital experiences with Next.js, React, Node.js, and Cloud technologies.";
-  const resumeUrl = profile?.resumeUrl || "#";
+  const resumeUrl = (profile?.resumeUrl && profile.resumeUrl !== "#") ? profile.resumeUrl : "/resume.pdf";
   const githubUrl = profile?.githubUrl || "https://github.com";
   const linkedinUrl = profile?.linkedinUrl || "https://linkedin.com";
   const twitterUrl = profile?.twitterUrl || "https://twitter.com";

@@ -24,54 +24,138 @@ interface ProjectsShowcaseProps {
   projects?: Project[];
 }
 
-const defaultProjects: Project[] = [
+export const defaultProjects: Project[] = [
   {
     id: "1",
-    title: "AI-Powered Analytics Dashboard",
-    description: "Real-time analytics portal with custom chart visualizer and automated AI insights generation.",
-    longDescription: "A high-performance analytics dashboard built for enterprise data exploration. Integrates real-time WebSocket streams, custom chart canvas rendering, and AI metric summaries.",
-    imageUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
-    category: "Full Stack",
-    techStack: ["Next.js", "TypeScript", "Tailwind CSS", "Prisma", "Supabase", "Chart.js"],
-    githubUrl: "https://github.com/example/analytics-dashboard",
-    liveUrl: "https://analytics-demo.example.com",
+    title: "MedBriefAI",
+    description: "An AI-driven clinical triage platform that accelerates consultation prep by extracting patient symptoms and lab data into structured SOAP summaries using grounded RAG search.",
+    longDescription: "An AI-driven clinical triage platform that accelerates consultation prep by extracting patient symptoms and lab data into structured SOAP summaries using grounded RAG search. Features secure JWT/Bcrypt authentication and real-time medical PDF report ingestion.",
+    imageUrl: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80",
+    category: "AI / ML",
+    techStack: ["Next.js", "RAG", "AI/LLMs", "JWT/Bcrypt", "PDF Parsing"],
+    githubUrl: "https://github.com/Siddharth0317/MedBriefAI",
+    liveUrl: "http://med-brief-ai-three.vercel.app/",
     featured: true,
+    order: 1,
   },
   {
     id: "2",
-    title: "Cloud Native E-Commerce Engine",
-    description: "Headless e-commerce platform with microservices architecture and automated stripe checkout flow.",
-    longDescription: "Scalable headless commerce solution with sub-second page loads, automated inventory synchronization, multi-currency support, and Stripe payments integration.",
-    imageUrl: "https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&w=800&q=80",
-    category: "Full Stack",
-    techStack: ["React", "Node.js", "PostgreSQL", "Tailwind CSS", "Stripe API", "Docker"],
-    githubUrl: "https://github.com/example/ecommerce-engine",
-    liveUrl: "https://store-demo.example.com",
+    title: "LedgerFlow_AI",
+    description: "An autonomous financial operations platform leveraging a 5-agent AI pipeline to ingest, mathematically validate, and post invoices using natural language inputs.",
+    longDescription: "An autonomous financial operations platform leveraging a 5-agent AI pipeline to ingest, mathematically validate, and post invoices using natural language inputs. Built with Next.js, React Flow canvas, Gemini API, BullMQ queues, MongoDB, and live Socket.IO events.",
+    imageUrl: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80",
+    category: "AI / ML",
+    techStack: ["Next.js", "Node.js", "React Flow", "Gemini API", "BullMQ", "MongoDB", "Socket.IO"],
+    githubUrl: "https://github.com/Siddharth0317/LedgerFlow_AI",
+    liveUrl: "https://ledger-flow-ai-drab.vercel.app/",
     featured: true,
+    order: 2,
   },
   {
     id: "3",
-    title: "Developer Documentation & CLI Hub",
-    description: "Sleek MDX documentation engine with instant search, interactive code runner, and CLI tooling.",
-    longDescription: "Documentation framework featuring Algolia instant search, syntax highlighting, multi-tab code snippets, and automated API doc generation from OpenAPI schemas.",
+    title: "AutoHealQA",
+    description: "A self-healing autonomous QA engine that instantly translates natural language Jira requirements into comprehensive, multi-browser Playwright test scripts.",
+    longDescription: "A self-healing autonomous QA engine that instantly translates natural language Jira requirements into comprehensive, multi-browser Playwright test scripts with visual regression verification and dynamic selector recovery.",
     imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80",
-    category: "Frontend",
-    techStack: ["Next.js", "MDX", "Tailwind CSS", "Framer Motion", "Algolia"],
-    githubUrl: "https://github.com/example/doc-hub",
-    liveUrl: "https://docs-demo.example.com",
+    category: "Automation / QA",
+    techStack: ["Playwright", "AI Neural Engine (70B)", "BDD", "Multi-Browser Automation", "Visual Regression"],
+    githubUrl: "https://github.com/Siddharth0317/AutoHealQA",
+    liveUrl: "https://auto-heal-qa.vercel.app/",
+    featured: true,
+    order: 3,
+  },
+  {
+    id: "4",
+    title: "AI Analytics Dashboard",
+    description: "A full-stack, real-time analytics portal that visualizes complex data and generates automated AI-driven business insights.",
+    longDescription: "A full-stack, real-time analytics portal that visualizes complex data and generates automated AI-driven business insights using Next.js, Supabase PostgreSQL, Prisma ORM, and responsive Chart.js components.",
+    imageUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
+    category: "Full Stack",
+    techStack: ["Next.js", "TypeScript", "Tailwind CSS", "Prisma", "Supabase", "Chart.js"],
+    githubUrl: "https://github.com/Siddharth0317/ai-analytics-dashboard",
+    liveUrl: "https://vercel.com/siddharth-rahanes-projects/ai-analytics-dashboard",
+    featured: true,
+    order: 4,
+  },
+  {
+    id: "5",
+    title: "Netguard_AI",
+    description: "An interactive, AI-powered network monitoring dashboard designed to analyze traffic patterns and identify potential security threats in real-time.",
+    longDescription: "An interactive, AI-powered network monitoring dashboard designed to analyze traffic patterns and identify potential security threats in real-time with machine learning models and Streamlit.",
+    imageUrl: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80",
+    category: "AI / ML",
+    techStack: ["Python", "Streamlit", "Machine Learning", "Network Security Analysis"],
+    githubUrl: "https://github.com/Siddharth0317/Netgaurd_AI",
+    liveUrl: "https://netgaurd.streamlit.app/",
     featured: false,
+    order: 5,
+  },
+  {
+    id: "6",
+    title: "MyPortfolio2.0",
+    description: "A high-performance, interactive personal developer portfolio featuring sleek animations, responsive design, and a comprehensive showcase of full-stack system architectures.",
+    longDescription: "A high-performance, interactive personal developer portfolio featuring sleek animations, responsive design, interactive CLI terminal, Gemini AI twin, and a comprehensive showcase of full-stack system architectures.",
+    imageUrl: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80",
+    category: "Frontend",
+    techStack: ["Next.js (App Router)", "React", "TypeScript", "Tailwind CSS", "Framer Motion"],
+    githubUrl: "https://github.com/Siddharth0317/MyPortfolio2.0",
+    liveUrl: "https://my-portfolio2-0-seven.vercel.app/",
+    featured: false,
+    order: 6,
+  },
+  {
+    id: "7",
+    title: "CodeCheck",
+    description: "An automated development tool that analyzes source code repositories to ensure code quality, catch early-stage bugs, and seamlessly enforce best practices.",
+    longDescription: "An automated development tool that analyzes source code repositories to ensure code quality, catch early-stage bugs, and seamlessly enforce best practices across continuous integration pipelines.",
+    imageUrl: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80",
+    category: "Backend",
+    techStack: ["Python/Node.js", "LLM Integration", "Static Code Analysis", "CI/CD"],
+    githubUrl: "https://github.com/Siddharth0317/codecheck",
+    liveUrl: null,
+    featured: false,
+    order: 7,
+  },
+  {
+    id: "8",
+    title: "AetherStore",
+    description: "A cloud-native, headless e-commerce engine featuring a robust microservices architecture and a secure, automated checkout pipeline.",
+    longDescription: "A cloud-native, headless e-commerce engine featuring a robust microservices architecture, PostgreSQL database, Docker containerization, and a secure automated Stripe checkout pipeline.",
+    imageUrl: "https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&w=800&q=80",
+    category: "Full Stack",
+    techStack: ["React", "Node.js", "PostgreSQL", "Tailwind CSS", "Stripe API", "Docker"],
+    githubUrl: "https://github.com/Siddharth0317/AetherStore",
+    liveUrl: null,
+    featured: false,
+    order: 8,
+  },
+  {
+    id: "9",
+    title: "Test-Automation",
+    description: "A comprehensive test automation framework built to integrate with CI/CD pipelines, ensuring software reliability through resilient end-to-end testing.",
+    longDescription: "A comprehensive test automation framework built to integrate with CI/CD pipelines, ensuring software reliability through resilient end-to-end testing, cross-browser validation, and automated GitHub Actions workflows.",
+    imageUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
+    category: "Automation / QA",
+    techStack: ["Selenium/Playwright", "PyTest/Jest", "GitHub Actions", "Automated Frameworks"],
+    githubUrl: "https://github.com/Siddharth0317/Test-Automation",
+    liveUrl: null,
+    featured: false,
+    order: 9,
   },
 ];
 
 export default function ProjectsShowcase({ projects = defaultProjects }: ProjectsShowcaseProps) {
+  const activeProjects = projects && projects.length > 0 ? projects : defaultProjects;
   const [activeCategory, setActiveCategory] = useState("All");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-  const categories = ["All", "Full Stack", "Frontend", "Backend", "AI / ML"];
+  // Dynamically compute unique categories from active projects
+  const uniqueCategories = Array.from(new Set(activeProjects.map((p) => p.category)));
+  const categories = ["All", ...uniqueCategories];
 
   const filteredProjects = activeCategory === "All"
-    ? projects
-    : projects.filter((p) => p.category.toLowerCase() === activeCategory.toLowerCase());
+    ? activeProjects
+    : activeProjects.filter((p) => p.category.toLowerCase() === activeCategory.toLowerCase());
 
   const trackEvent = (id: string, action: "view" | "click") => {
     fetch(`/api/projects/${id}/view`, {
@@ -200,7 +284,7 @@ export default function ProjectsShowcase({ projects = defaultProjects }: Project
                         <GithubIcon className="w-4 h-4" />
                       </a>
                     )}
-                    {project.liveUrl && (
+                    {project.liveUrl && project.liveUrl !== "N/A" && (
                       <a
                         href={project.liveUrl}
                         target="_blank"
@@ -279,7 +363,7 @@ export default function ProjectsShowcase({ projects = defaultProjects }: Project
                 </div>
 
                 <div className="flex flex-wrap gap-4 pt-4 border-t border-white/10">
-                  {selectedProject.liveUrl && (
+                  {selectedProject.liveUrl && selectedProject.liveUrl !== "N/A" && (
                     <a
                       href={selectedProject.liveUrl}
                       target="_blank"
@@ -290,7 +374,7 @@ export default function ProjectsShowcase({ projects = defaultProjects }: Project
                       <ExternalLink className="w-4 h-4" /> Live Demo
                     </a>
                   )}
-                  {selectedProject.githubUrl && (
+                  {selectedProject.githubUrl && selectedProject.githubUrl !== "N/A" && (
                     <a
                       href={selectedProject.githubUrl}
                       target="_blank"

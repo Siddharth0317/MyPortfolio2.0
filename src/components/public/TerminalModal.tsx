@@ -156,8 +156,8 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
       case "bio":
         output = (
           <div className="text-xs text-slate-300 space-y-1">
-            <p className="text-white font-bold">{profile?.name || "Siddharth"} — {profile?.title || "Senior Full-Stack Engineer"}</p>
-            <p className="text-slate-400">{profile?.bio || "Passionate engineer with 6+ years of experience building high-scale web apps, Next.js microservices, and interactive web tooling."}</p>
+            <p className="text-white font-bold">{profile?.name || "Siddharth"} — {profile?.title || "Full Stack Engineer and AI Enthusiast"}</p>
+            <p className="text-slate-400">{profile?.bio || "Passionate engineer building high-scale web apps, Next.js microservices, AI workflows, and interactive web tooling."}</p>
           </div>
         );
         break;
@@ -179,17 +179,25 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
           output = (
             <div className="text-xs space-y-1 text-slate-300">
               <p className="text-amber-400 font-bold">★ Featured Projects:</p>
-              <p>1. <span className="text-white font-semibold">AI-Powered Analytics Dashboard</span> (Next.js, Supabase, Chart.js)</p>
-              <p>2. <span className="text-white font-semibold">Cloud Native E-Commerce Engine</span> (React, Node.js, Stripe, Docker)</p>
+              <p>1. <span className="text-white font-semibold">MedBriefAI</span> (Next.js, RAG, AI/LLMs, PDF Parsing)</p>
+              <p>2. <span className="text-white font-semibold">LedgerFlow_AI</span> (Next.js, React Flow, Gemini API, BullMQ)</p>
+              <p>3. <span className="text-white font-semibold">AutoHealQA</span> (Playwright, AI Neural Engine, BDD)</p>
+              <p>4. <span className="text-white font-semibold">AI Analytics Dashboard</span> (Next.js, Supabase, Chart.js)</p>
             </div>
           );
         } else {
           output = (
             <div className="text-xs space-y-1 text-slate-300">
-              <p className="text-indigo-400 font-bold">All Showcase Projects:</p>
-              <p>• <span className="text-white font-semibold">AI Analytics Portal</span> — Real-time metrics &amp; AI insights</p>
-              <p>• <span className="text-white font-semibold">Headless E-Commerce Engine</span> — Microservices &amp; Stripe checkout</p>
-              <p>• <span className="text-white font-semibold">Developer Documentation Hub</span> — MDX &amp; Algolia search</p>
+              <p className="text-indigo-400 font-bold">All Showcase Projects (9):</p>
+              <p>1. <span className="text-white font-semibold">MedBriefAI</span> — Clinical triage platform with grounded RAG</p>
+              <p>2. <span className="text-white font-semibold">LedgerFlow_AI</span> — Autonomous 5-agent financial operations</p>
+              <p>3. <span className="text-white font-semibold">AutoHealQA</span> — Self-healing autonomous Playwright QA engine</p>
+              <p>4. <span className="text-white font-semibold">AI Analytics Dashboard</span> — Real-time metrics &amp; AI insights</p>
+              <p>5. <span className="text-white font-semibold">Netguard_AI</span> — AI-powered network monitoring dashboard</p>
+              <p>6. <span className="text-white font-semibold">MyPortfolio2.0</span> — Interactive developer portfolio &amp; admin</p>
+              <p>7. <span className="text-white font-semibold">CodeCheck</span> — Automated static code analysis &amp; quality tool</p>
+              <p>8. <span className="text-white font-semibold">AetherStore</span> — Cloud-native headless e-commerce engine</p>
+              <p>9. <span className="text-white font-semibold">Test-Automation</span> — Resilient CI/CD end-to-end framework</p>
               <p className="text-slate-500 italic mt-1">Scroll to #projects on page to view full interactive grid.</p>
             </div>
           );
@@ -198,13 +206,18 @@ export default function TerminalModal({ isOpen, onClose, onOpenResume, profile }
 
       case "timeline":
       case "exp":
+      case "certs":
         output = (
           <div className="text-xs space-y-1 text-slate-300">
-            <p className="text-indigo-400 font-bold">Career &amp; Milestone Timeline:</p>
-            <p>• <span className="text-white font-semibold">Lead Architect</span> @ TechCorp Global (2023 - Present)</p>
-            <p>• <span className="text-white font-semibold">Senior Software Engineer</span> @ Innovate AI Labs (2021 - 2023)</p>
-            <p>• <span className="text-amber-400 font-semibold">AWS Solutions Architect</span> Certified (2023)</p>
-            <p>• <span className="text-cyan-400 font-semibold">B.S. Computer Science</span> (2017 - 2021)</p>
+            <p className="text-indigo-400 font-bold">Certifications &amp; Key Milestones (12):</p>
+            <p>• <span className="text-white font-semibold">AI Automation Platform</span> — NxtWave Academy (2026)</p>
+            <p>• <span className="text-amber-400 font-semibold">AWS Cloud Practitioner Essentials</span> — AWS (2025)</p>
+            <p>• <span className="text-white font-semibold">Generative AI Mega Workshop 2.0</span> — NXT WAVE (2024)</p>
+            <p>• <span className="text-white font-semibold">NxtCode 25 Under 5 Challenge</span> — NXT WAVE (2025)</p>
+            <p>• <span className="text-emerald-400 font-semibold">TECHNORBIT Certified C++ Programmer</span> — Technorbit (2023)</p>
+            <p>• <span className="text-emerald-400 font-semibold">TECHNORBIT Certified DSA in C</span> — Technorbit (2023)</p>
+            <p>• <span className="text-cyan-400 font-semibold">B.E in Information Technology</span> — SPPU (2021 - 2026)</p>
+            <p className="text-slate-500 italic mt-1">Scroll to #timeline on page to view all verified credentials and masterclasses.</p>
           </div>
         );
         break;

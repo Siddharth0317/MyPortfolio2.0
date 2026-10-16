@@ -39,9 +39,9 @@ export async function POST(req: Request) {
       }),
     ]);
 
-    const name = rawProfile?.name || "Alex Dev";
-    const title = rawProfile?.title || "Senior Full-Stack Engineer & System Architect";
-    const bio = rawProfile?.bio || "Passionate engineer with experience building web applications, Next.js microservices, and distributed cloud architecture.";
+    const name = rawProfile?.name || "Siddharth";
+    const title = rawProfile?.title || "Full Stack Engineer and AI Enthusiast";
+    const bio = rawProfile?.bio || "Passionate engineer with experience building web applications, Next.js microservices, and AI systems.";
     const githubUrl = rawProfile?.githubUrl || "https://github.com";
     const linkedinUrl = rawProfile?.linkedinUrl || "https://linkedin.com";
 
@@ -122,19 +122,26 @@ INSTRUCTIONS:
     }
 
     // Smart Knowledge Engine Fallback if Gemini Key is absent or fails
+    const lower = userMessage.toLowerCase();
     let reply = `Thanks for asking! As ${name}'s AI Assistant, I can confirm that ${name} is a ${title} specializing in Next.js, TypeScript, PostgreSQL, and Cloud Systems.`;
 
-    const lower = userMessage.toLowerCase();
+    const displayProjects = rawProjects.length > 0 ? rawProjects : [
+      { title: "MedBriefAI", category: "AI / ML", description: "An AI-driven clinical triage platform that accelerates consultation prep using grounded RAG search." },
+      { title: "LedgerFlow_AI", category: "AI / ML", description: "An autonomous financial operations platform leveraging a 5-agent AI pipeline to ingest and validate invoices." },
+      { title: "AutoHealQA", category: "Automation / QA", description: "A self-healing autonomous QA engine translating Jira requirements into Playwright test scripts." },
+      { title: "AI Analytics Dashboard", category: "Full Stack", description: "A full-stack, real-time analytics portal that visualizes data and generates AI business insights." },
+    ];
+
     if (lower.includes("project") || lower.includes("work") || lower.includes("build")) {
-      reply = `Here are some of ${name}'s top projects currently in the database:\n\n` +
-        rawProjects.slice(0, 3).map((p) => `• **${p.title}** (${p.category}): ${p.description}`).join("\n\n") +
-        `\n\nYou can explore all projects in the Showcase section!`;
+      reply = `Here are some of ${name}'s top projects:\n\n` +
+        displayProjects.slice(0, 4).map((p) => `• **${p.title}** (${p.category}): ${p.description}`).join("\n\n") +
+        `\n\nYou can explore all 9 projects in the Showcase section!`;
     } else if (lower.includes("skill") || lower.includes("stack") || lower.includes("tech")) {
       reply = `${name}'s technical matrix includes:\n\n` +
         rawSkills.slice(0, 6).map((s) => `• **${s.name}** (${s.category})`).join("\n") +
         `\n\n${name} has extensive experience building production-grade web applications.`;
     } else if (lower.includes("contact") || lower.includes("hire") || lower.includes("email") || lower.includes("reach")) {
-      reply = `${name} is currently open for Full-Time Lead & Senior Full-Stack Engineering roles and consulting contracts! You can send a direct message using the Contact Form at the bottom of the page.`;
+      reply = `${name} is currently open for Full-Time Full Stack Engineering roles, AI projects, and consulting contracts! You can send a direct message using the Contact Form at the bottom of the page.`;
     }
 
     return NextResponse.json({ reply });

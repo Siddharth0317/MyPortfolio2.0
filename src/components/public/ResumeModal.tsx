@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -18,6 +18,12 @@ import {
   Layers,
   Terminal,
   Eye,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
 } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "@/components/common/SocialIcons";
 
@@ -32,6 +38,310 @@ interface ResumeModalProps {
     githubUrl?: string;
     linkedinUrl?: string;
   };
+}
+
+function PdfCanvasViewer({
+  pdfUrl,
+  title,
+  onSwitchToInteractive,
+}: {
+  pdfUrl: string;
+  title: string;
+  onSwitchToInteractive: () => void;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const renderTaskRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const [pdfDoc, setPdfDoc] = useState<any>(null);
+  const [pageNum, setPageNum] = useState(1);
+  const [numPages, setNumPages] = useState(1);
+  const [scale, setScale] = useState(1.2);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Auto-fit scale on mount according to container width
+  useEffect(() => {
+    if (containerRef.current) {
+      const containerWidth = containerRef.current.clientWidth;
+      if (containerWidth < 650) {
+        const responsiveScale = Math.max(0.65, (containerWidth - 32) / 600);
+        setScale(+responsiveScale.toFixed(2));
+      } else {
+        setScale(1.25);
+      }
+    }
+  }, []);
+
+  // 1. Load PDF.js engine and fetch document
+  useEffect(() => {
+    let isCancelled = false;
+
+    const initPdf = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // Ensure window.pdfjsLib is loaded
+        if (!(window as any).pdfjsLib) {
+          await new Promise<void>((resolve, reject) => {
+            const existingScript = document.querySelector('script[data-pdfjs="true"]');
+            if (existingScript) {
+              if ((window as any).pdfjsLib) {
+                resolve();
+              } else {
+                existingScript.addEventListener("load", () => resolve());
+                existingScript.addEventListener("error", () => reject(new Error("Failed to load PDF script")));
+              }
+              return;
+            }
+            const script = document.createElement("script");
+            script.src = "/pdfjs/pdf.min.js";
+            script.dataset.pdfjs = "true";
+            script.onload = () => resolve();
+            script.onerror = () => {
+              // CDN fallback if local asset is unreachable
+              const cdnScript = document.createElement("script");
+              cdnScript.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+              cdnScript.onload = () => resolve();
+              cdnScript.onerror = () => reject(new Error("Failed to load PDF viewer engine"));
+              document.head.appendChild(cdnScript);
+            };
+            document.head.appendChild(script);
+          });
+        }
+
+        const pdfjs = (window as any).pdfjsLib;
+        if (!pdfjs) throw new Error("PDF engine unavailable");
+        pdfjs.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.js";
+
+        const loadingTask = pdfjs.getDocument(pdfUrl);
+        const doc = await loadingTask.promise;
+
+        if (isCancelled) return;
+        setPdfDoc(doc);
+        setNumPages(doc.numPages || 1);
+        setPageNum(1);
+      } catch (err: any) {
+        if (!isCancelled) {
+          console.error("PDF.js initialization error:", err);
+          setError("Direct PDF visual rendering could not be loaded in your browser.");
+        }
+      } finally {
+        if (!isCancelled) setIsLoading(false);
+      }
+    };
+
+    initPdf();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [pdfUrl]);
+
+  // 2. Render Page on Canvas
+  useEffect(() => {
+    if (!pdfDoc || !canvasRef.current) return;
+    let isCancelled = false;
+
+    const render = async () => {
+      try {
+        if (renderTaskRef.current) {
+          try {
+            renderTaskRef.current.cancel();
+          } catch {}
+        }
+
+        const page = await pdfDoc.getPage(pageNum);
+        if (isCancelled || !canvasRef.current) return;
+
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        const viewport = page.getViewport({ scale });
+        const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+
+        canvas.width = Math.floor(viewport.width * dpr);
+        canvas.height = Math.floor(viewport.height * dpr);
+        canvas.style.width = `${Math.floor(viewport.width)}px`;
+        canvas.style.height = `${Math.floor(viewport.height)}px`;
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(dpr, dpr);
+
+        const renderContext = {
+          canvasContext: ctx,
+          viewport,
+        };
+
+        const task = page.render(renderContext);
+        renderTaskRef.current = task;
+        await task.promise;
+      } catch (err: any) {
+        if (err?.name !== "RenderingCancelledException") {
+          console.error("PDF page render error:", err);
+        }
+      }
+    };
+
+    render();
+
+    return () => {
+      isCancelled = true;
+      if (renderTaskRef.current) {
+        try {
+          renderTaskRef.current.cancel();
+        } catch {}
+      }
+    };
+  }, [pdfDoc, pageNum, scale]);
+
+  const handleZoomIn = () => setScale((s) => Math.min(2.5, +(s + 0.15).toFixed(2)));
+  const handleZoomOut = () => setScale((s) => Math.max(0.6, +(s - 0.15).toFixed(2)));
+  const handleResetZoom = () => {
+    if (containerRef.current) {
+      const containerWidth = containerRef.current.clientWidth;
+      const fitScale = Math.min(1.4, Math.max(0.6, (containerWidth - 48) / 600));
+      setScale(+fitScale.toFixed(2));
+    } else {
+      setScale(1.25);
+    }
+  };
+
+  return (
+    <div ref={containerRef} className="space-y-4 max-w-4xl mx-auto">
+      {/* PDF Controls Floating Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl glass-card bg-slate-900/90 border border-white/10 shadow-lg">
+        {/* Zoom Controls */}
+        <div className="flex items-center gap-1.5 bg-slate-950/80 p-1 rounded-xl border border-white/5">
+          <button
+            onClick={handleZoomOut}
+            disabled={scale <= 0.6}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 disabled:opacity-40 transition-colors"
+            title="Zoom Out"
+            aria-label="Zoom Out"
+          >
+            <ZoomOut className="w-4 h-4" />
+          </button>
+          <span className="text-xs font-bold text-slate-300 px-2 min-w-[3.5rem] text-center">
+            {Math.round(scale * 100)}%
+          </span>
+          <button
+            onClick={handleZoomIn}
+            disabled={scale >= 2.5}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 disabled:opacity-40 transition-colors"
+            title="Zoom In"
+            aria-label="Zoom In"
+          >
+            <ZoomIn className="w-4 h-4" />
+          </button>
+          <button
+            onClick={handleResetZoom}
+            className="p-1.5 rounded-lg text-indigo-400 hover:text-indigo-300 hover:bg-indigo-600/20 transition-colors ml-1"
+            title="Fit to Width"
+            aria-label="Fit Width"
+          >
+            <RotateCcw className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Page navigation (if multi-page) */}
+        {numPages > 1 && (
+          <div className="flex items-center gap-2 bg-slate-950/80 px-3 py-1.5 rounded-xl border border-white/5 text-xs text-slate-300 font-semibold">
+            <button
+              onClick={() => setPageNum((p) => Math.max(1, p - 1))}
+              disabled={pageNum <= 1}
+              className="p-1 rounded text-slate-400 hover:text-white disabled:opacity-40"
+              aria-label="Previous Page"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span>
+              Page {pageNum} of {numPages}
+            </span>
+            <button
+              onClick={() => setPageNum((p) => Math.min(numPages, p + 1))}
+              disabled={pageNum >= numPages}
+              className="p-1 rounded text-slate-400 hover:text-white disabled:opacity-40"
+              aria-label="Next Page"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Action Links */}
+        <div className="flex items-center gap-2">
+          <a
+            href={pdfUrl}
+            download="Siddharth_Rahane_Resume.pdf"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-md shadow-emerald-600/30"
+          >
+            <Download className="w-3.5 h-3.5" /> Download PDF
+          </a>
+          <a
+            href={pdfUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl glass-card text-slate-300 hover:text-white text-xs font-semibold border border-white/10"
+          >
+            <ExternalLink className="w-3.5 h-3.5" /> Open in New Tab
+          </a>
+        </div>
+      </div>
+
+      {/* PDF Canvas View Area */}
+      <div className="min-h-[500px] flex items-center justify-center p-3 sm:p-6 rounded-2xl bg-slate-900/60 border border-white/10 shadow-inner overflow-x-auto">
+        {isLoading && (
+          <div className="flex flex-col items-center justify-center py-20 gap-3 text-slate-400">
+            <Loader2 className="w-8 h-8 animate-spin text-indigo-400" />
+            <p className="text-xs font-semibold">Rendering verified PDF resume...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center py-12 px-6 max-w-md space-y-4">
+            <p className="text-sm text-amber-300">{error}</p>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <a
+                href={pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold inline-flex items-center gap-2"
+              >
+                <ExternalLink className="w-4 h-4" /> Open Resume in New Tab
+              </a>
+              <button
+                onClick={onSwitchToInteractive}
+                className="px-4 py-2 rounded-xl glass-card text-slate-200 hover:text-white text-xs font-bold"
+              >
+                Switch to Interactive View
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className={`transition-opacity duration-300 ${isLoading || error ? "hidden" : "block"}`}>
+          <canvas
+            ref={canvasRef}
+            className="rounded-lg shadow-2xl bg-white mx-auto block max-w-full"
+            style={{ display: isLoading || error ? "none" : "block" }}
+          />
+        </div>
+      </div>
+
+      {/* Footer Switcher */}
+      <div className="text-center pt-2">
+        <button
+          onClick={onSwitchToInteractive}
+          className="text-xs text-indigo-400 hover:text-indigo-300 underline font-semibold transition-colors"
+        >
+          Switch to Interactive Web Resume View
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export default function ResumeModal({ isOpen, onClose, profile }: ResumeModalProps) {
@@ -141,41 +451,11 @@ export default function ResumeModal({ isOpen, onClose, profile }: ResumeModalPro
           {/* Modal Body */}
           <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-950/80">
             {viewMode === "pdf" ? (
-              <div className="space-y-4">
-                <div className="w-full h-[70vh] rounded-2xl overflow-hidden border border-white/10 bg-slate-900 shadow-inner">
-                  <object
-                    data={`${resumeUrl}#view=FitH`}
-                    type="application/pdf"
-                    className="w-full h-full"
-                  >
-                    <iframe
-                      src={`${resumeUrl}#view=FitH`}
-                      className="w-full h-full border-none"
-                      title={`${name} Resume`}
-                    >
-                      <div className="p-8 text-center text-slate-300">
-                        <p className="mb-4">Your browser doesn&apos;t support direct PDF embedding.</p>
-                        <a
-                          href={resumeUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold inline-flex items-center gap-2"
-                        >
-                          <ExternalLink className="w-4 h-4" /> Open Resume in New Tab
-                        </a>
-                      </div>
-                    </iframe>
-                  </object>
-                </div>
-                <div className="text-center">
-                  <button
-                    onClick={() => setViewMode("interactive")}
-                    className="text-xs text-indigo-400 hover:text-indigo-300 underline font-semibold"
-                  >
-                    Switch to Interactive Web Resume View
-                  </button>
-                </div>
-              </div>
+              <PdfCanvasViewer
+                pdfUrl={resumeUrl}
+                title={`${name} Resume`}
+                onSwitchToInteractive={() => setViewMode("interactive")}
+              />
             ) : (
               /* Rich Interactive Resume View */
               <div className="glass-card p-6 sm:p-8 rounded-2xl border border-white/10 space-y-8 bg-slate-900/80 max-w-3xl mx-auto shadow-xl">
@@ -212,7 +492,7 @@ export default function ResumeModal({ isOpen, onClose, profile }: ResumeModalPro
                       <Mail className="w-3.5 h-3.5 text-indigo-400" /> siddharth3172003@gmail.com
                     </a>
                     <a
-                      href="https://github.com/Siddharth0317"
+                      href={profile?.githubUrl || "https://github.com/Siddharth0317"}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950/80 border border-white/5 hover:border-indigo-500/40 text-slate-300 hover:text-white transition-colors"
@@ -220,7 +500,7 @@ export default function ResumeModal({ isOpen, onClose, profile }: ResumeModalPro
                       <GithubIcon className="w-3.5 h-3.5 text-indigo-400" /> github.com/Siddharth0317
                     </a>
                     <a
-                      href="https://linkedin.com"
+                      href={profile?.linkedinUrl || "https://www.linkedin.com/in/siddharth-031s"}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950/80 border border-white/5 hover:border-indigo-500/40 text-slate-300 hover:text-white transition-colors"

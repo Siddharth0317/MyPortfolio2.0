@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET(req: Request) {
   try {
@@ -47,6 +51,7 @@ export async function POST(req: Request) {
       },
     });
 
+    revalidatePath("/");
     return NextResponse.json(skill, { status: 201 });
   } catch (error: any) {
     console.error("Error creating skill:", error);

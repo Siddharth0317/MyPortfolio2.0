@@ -21,12 +21,15 @@ const DEFAULT_PROFILE = {
   customCertsCount: "",
 };
 
+import { revalidatePath } from "next/cache";
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET() {
   try {
     let user = await prisma.user.findFirst({
+      orderBy: { updatedAt: "desc" },
       select: {
         id: true,
         email: true,
@@ -85,7 +88,9 @@ export async function PUT(req: Request) {
     }
 
     const body = await req.json();
-    const user = await prisma.user.findFirst();
+    const user = await prisma.user.findFirst({
+      orderBy: { updatedAt: "desc" },
+    });
 
     let updatedUser;
 
@@ -131,10 +136,13 @@ export async function PUT(req: Request) {
         },
       });
     } else {
-      // Update existing user
-      updatedUser = await prisma.user.update({
-        where: { id: user.id },
+      // Update ALL existing users to keep everything perfectly synchronized
+      await prisma.user.updateMany({
         data: updatePayload,
+      });
+
+      updatedUser = await prisma.user.findFirst({
+        orderBy: { updatedAt: "desc" },
         select: {
           id: true,
           email: true,
@@ -154,6 +162,9 @@ export async function PUT(req: Request) {
         },
       });
     }
+
+    revalidatePath("/");
+    revalidatePath("/admin/profile");
 
     return NextResponse.json(updatedUser);
   } catch (error: any) {

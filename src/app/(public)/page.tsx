@@ -6,7 +6,9 @@ export const revalidate = 0;
 
 async function getData() {
   try {
-    const rawProfile = await prisma.user.findFirst();
+    const rawProfile = await prisma.user.findFirst({
+      orderBy: { updatedAt: "desc" },
+    });
     const rawProjects = await prisma.project.findMany({
       where: { isHidden: false },
       orderBy: { order: "asc" },
@@ -33,10 +35,10 @@ async function getData() {
           githubUrl: rawProfile.githubUrl || undefined,
           linkedinUrl: rawProfile.linkedinUrl || undefined,
           twitterUrl: rawProfile.twitterUrl || undefined,
-          yearsExperience: rawProfile.yearsExperience || "6+",
+          yearsExperience: rawProfile.yearsExperience || "1+ Years",
           codeQuality: rawProfile.codeQuality || "80+%",
           customProjectsCount: rawProfile.customProjectsCount || "15+",
-          customCertsCount: rawProfile.customCertsCount || "10+",
+          customCertsCount: rawProfile.customCertsCount || undefined,
           totalProjectsInDb: rawProjects.length,
           totalCertsInDb: rawAchievements.length,
         }

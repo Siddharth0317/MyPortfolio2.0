@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -30,6 +31,7 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
       },
     });
 
+    revalidatePath("/");
     return NextResponse.json(project);
   } catch (error: any) {
     const { id } = await context.params;
@@ -50,6 +52,7 @@ export async function DELETE(req: Request, context: { params: Promise<{ id: stri
       where: { id },
     });
 
+    revalidatePath("/");
     return NextResponse.json({ success: true, message: "Project deleted successfully" });
   } catch (error: any) {
     const { id } = await context.params;

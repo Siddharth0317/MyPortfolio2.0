@@ -59,7 +59,10 @@ export default function ContactForm() {
 
   return (
     <section id="contact" className="py-24 relative overflow-hidden">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="bg-glow-purple -top-28 -left-28 animate-pulse-slow pointer-events-none" />
+      <div className="bg-glow-cyan -bottom-28 -right-28 animate-pulse-slow pointer-events-none" />
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-14">
@@ -79,7 +82,7 @@ export default function ContactForm() {
           viewport={{ once: true }}
           className="glass-card p-6 sm:p-10 rounded-3xl border border-white/10 relative overflow-hidden"
         >
-          <div className="absolute -top-20 -right-20 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="bg-glow-purple -top-20 -right-20 pointer-events-none opacity-40" />
 
           {status && (
             <div

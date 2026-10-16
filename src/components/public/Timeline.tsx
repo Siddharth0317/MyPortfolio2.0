@@ -218,7 +218,10 @@ export default function Timeline({ achievements = defaultAchievements }: Timelin
 
   return (
     <section id="timeline" className="py-24 relative overflow-hidden bg-slate-950/60">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="bg-glow-purple top-20 -left-36 animate-pulse-slow pointer-events-none" />
+      <div className="bg-glow-cyan bottom-20 -right-36 animate-pulse-slow pointer-events-none" />
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">

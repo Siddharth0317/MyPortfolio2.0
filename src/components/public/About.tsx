@@ -117,7 +117,10 @@ export default function About({
 
   return (
     <section id="about" className="py-24 relative overflow-hidden bg-slate-950/60">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="bg-glow-purple -top-32 -left-32 animate-pulse-slow pointer-events-none" />
+      <div className="bg-glow-cyan -bottom-32 -right-32 animate-pulse-slow pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
@@ -157,7 +160,7 @@ export default function About({
           viewport={{ once: true }}
           className="glass-card p-8 rounded-3xl mb-16 border border-white/10 relative overflow-hidden"
         >
-          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="bg-glow-purple -top-20 -right-20 pointer-events-none opacity-40" />
           <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
             <Zap className="w-5 h-5 text-indigo-400" />
             Engineering Philosophy

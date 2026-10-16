@@ -57,6 +57,13 @@ export function applyTheme(themeId: ThemePreset) {
   const root = document.documentElement;
   THEME_PRESETS.forEach((t) => root.classList.remove(`theme-${t.id}`));
   root.classList.add(`theme-${themeId}`);
+
+  const preset = THEME_PRESETS.find((t) => t.id === themeId);
+  if (preset) {
+    root.style.setProperty("--primary-color", preset.primaryColor);
+    root.style.setProperty("--secondary-color", preset.secondaryColor);
+  }
+
   localStorage.setItem("portfolio_theme", themeId);
 }
 

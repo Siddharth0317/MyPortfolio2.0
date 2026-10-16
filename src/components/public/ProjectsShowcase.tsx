@@ -172,7 +172,10 @@ export default function ProjectsShowcase({ projects = defaultProjects }: Project
 
   return (
     <section id="projects" className="py-24 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="bg-glow-purple -top-32 right-10 animate-pulse-slow pointer-events-none" />
+      <div className="bg-glow-cyan bottom-10 -left-20 animate-pulse-slow pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
